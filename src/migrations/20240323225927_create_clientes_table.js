@@ -4,9 +4,10 @@ exports.up = function(knex) {
         table.string('email').notNullable();
         table.string('nome').notNullable();
         table.string('telefone').notNullable();
-        table.integer('CPF').notNullable();
-        table.integer('CEP').notNullable();
+        table.string('CPF').notNullable();
+        table.string('CEP').notNullable();
         table.string('senha').notNullable();
+        table.string('dataEntrada').notNullable();
     })
 };
 
