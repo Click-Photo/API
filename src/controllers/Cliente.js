@@ -74,12 +74,15 @@ module.exports = {
     },
 
     async updateClientes (req,res){
+        
+        const { id } = req.params;
+
         const{
             nome,
             telefone,
             email,
             senha,
-            cep,
+            CEP,
         } = req.body;
 
         try{
@@ -90,7 +93,7 @@ module.exports = {
                 telefone,
                 email,
                 senha,
-                cep
+                CEP
             });
             res.status(200).json({ message: 'Dados do cliente atualizado com sucesso'})
         } catch (err){

@@ -9,13 +9,13 @@ const clienteController = require('./controllers/Cliente');
 
 //Rotas de crud padrão:
 router.post('/cadastro', clienteController.createClientes);
-router.post('/alterar',clienteController.updateClientes);
-router.post('/deletar',clienteController.deleteClientes);
+router.post('/alterar/:id',clienteController.updateClientes);
+router.post('/deletar/:id',clienteController.deleteClientes);
 router.post('/visualizar',clienteController.getAllClientes);
 
 //Metódos:
 router.post('/solicitarTrocaSenha',clienteController.requisitarResetSenha);
-router.post('/redefinirSenha',clienteController.resetSenha);
+router.post('/redefinirSenha/:id',clienteController.resetSenha);
 router.post('/autenticacao',clienteController.autenticacaoLogin);
 router.post('/validaToken',clienteController.verificarToken);
 
