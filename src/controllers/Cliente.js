@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const moment = require('moment');
 
 
 module.exports = {
@@ -22,21 +23,22 @@ module.exports = {
             nome,
             telefone,
             email,
-            cpf,
-            cep,
-            senha
+            CPF,
+            CEP,
+            senha,
+            dataEntrada
         } = req.body;
 
-        console.log(req.body);
-
         try {
+            const dataAtual = moment().format('YYYY-MM-DD');
+
             const resultsEmail = await db('cliente')
             .where('email', email)
             .select('*');
 
-            // const resultsCPF = await db('cliente')
-            // .where('CPF', cpf)
-            // .select('*');
+            const resultsCPF = await db('cliente')
+            .where('CPF', CPF)
+            .select('*');
 
             
 
@@ -45,12 +47,10 @@ module.exports = {
                 console.error('erro ao cadastrar o cliente: Cliente já cadastrado');
                 res.status(400).json({ message: 'Esse e-mail já possui um cadastro, faça login!'});
             } 
-            //else if (resultsCPF.length > 0){
-            //     console.error('erro ao cadastrar o cliente: CPF já cadastrado');
-            //     res.staus(400).json({message: 'Esse CPF já possui um cadastro, faça login!'})
-            // }
-
-            
+            if (resultsCPF.length > 0){
+                console.error('erro ao cadastrar o cliente: CPF já cadastrado');
+                res.status(400).json({message: 'Esse CPF já possui um cadastro, faça login!'})
+            }
 
             else{
                 const hashedPassword = await bcrypt.hash(senha, 10);
@@ -59,9 +59,10 @@ module.exports = {
                     nome,
                     telefone,
                     email,
-                    cpf,
-                    cep,
+                    CPF,
+                    CEP,
                     senha: hashedPassword,
+                    dataEntrada : dataAtual
                 });
     
                 res.status(201).json({id, message: 'cliente cadastrado.'});
@@ -102,9 +103,9 @@ module.exports = {
         const {id} = req.params;
 
         try{
-            await db('Job').where({idCliente}).del();
+            //await db('Job').where({idCliente}).del();
             await db('cliente').where({id}).del();
-            res(200).json({ message: 'Cliente excluido com sucesso!'})
+            res.status(200).json({ message: 'Cliente excluido com sucesso!'})
         } catch(err){
             console.error('Houve um erro ao realizar a exclusão do cliente')
             res.status(500).json({ message: 'Houve um problema para realizar a exclusão do cliente.'})
