@@ -36,18 +36,26 @@ module.exports = {
             .where('email', email)
             .select('*');
 
-            const resultsCPF = await db('cliente')
+            const resultsCpf = await db('cliente')
+            .where('CPF', CPF)
+            .select('*');
+
+            const resultsEmailFotografo = await db('fotografo')
+            .where('email',email)
+            .select('*');
+
+            const resultsCpfFotografo = await db('fotografo')
             .where('CPF', CPF)
             .select('*');
 
             
 
 
-            if (resultsEmail.length > 0){
+            if (resultsEmail.length || resultsEmailFotografo > 0){
                 console.error('erro ao cadastrar o cliente: Cliente já cadastrado');
                 res.status(400).json({ message: 'Esse e-mail já possui um cadastro, faça login!'});
             } 
-            if (resultsCPF.length > 0){
+            if (resultsCpf.length || resultsCpfFotografo > 0){
                 console.error('erro ao cadastrar o cliente: CPF já cadastrado');
                 res.status(400).json({message: 'Esse CPF já possui um cadastro, faça login!'})
             }
@@ -182,28 +190,39 @@ module.exports = {
         }
     },
 
-    async autenticacaoLogin(req,res){
-        const{email, senha} = req.body;
+    // async autenticacaoLogin(req,res){
+    //     const{email, senha} = req.body;
 
-        try{
-            const result = await db('clientes').where({email}).select('*');
+    //     try{
+    //         const result = await db('clientes').where({email}).select('*');
+    //         const resultFotografo = await db('fotografo').where({email}).select('*');
+    //         const resultAdministrador = await db('admin').where({email}).select('*');
 
-            if(result.length === 0){
-                res.status(401).json({ message: 'Email não localizado, confira novamente ou cadastra-se'});
-            }
+    //         if(result.length || resultFotografo || resultAdministrador < 1 ){
+    //             res.status(401).json({ message: 'Email não localizado, confira novamente ou cadastra-se'});
+            
 
-            const senhaIncritografada = result[0].senha;
-            const comparaSenha = await bcrypt.compare(senha, senhaIncritografada);
+    //         const senhaIncritografada = result[0].senha;
+    //         const comparaSenha = await bcrypt.compare(senha, senhaIncritografada);
 
-            if (comparaSenha) {
-                 res.json({ auth: true, token, userType: 'cliente', user: result});
-            }
+    //         if (comparaSenha) {
+    //              res.json({ auth: true, token, userType: 'cliente', user: result});
+    //         }   
 
-            res.status(401).json({message: "Senha inserida incorretamente."})           
-        } catch(err){
-            console.error("Erro ao redefinir a senha!", err)
-            res.status(500).json({message: 'Erro ao redefinir a senha, entre em contato com o administrador.'})
-        }
-    }
+    //         res.status(401).json({message: "Senha inserida incorretamente."})
+    //     } else{
+    //         const storedHashPass = resultAdministrador[0].senha;
+    //         const comparaSenha = await bcrypt.compare(senha, storedHashPass);
+            
+    //         if (comparaSenha) {
+    //             //Senha correta para admin
+    //             const token = jwt.sing({userId: resultAdministrador[0].id, userType: 'admin'}, 'jwtSecret',{expiresIn: '1h'})
+    //         }
+    //     }   
+    //     } catch(err){
+    //         console.error("Erro ao redefinir a senha!", err)
+    //         res.status(500).json({message: 'Erro ao redefinir a senha, entre em contato com o administrador.'})
+    //     }
+    // }
 
 }
