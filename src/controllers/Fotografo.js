@@ -47,13 +47,13 @@ module.exports = {
             .where('CPF', CPF)
             .select('*'); 
 
-            if (resultsEmail.length || resultsEmailFotografo > 0){
+            if (resultsEmail.length || resultsEmailCliente > 0){
                 console.error('erro ao cadastrar o fotografo: Fotografo já cadastrado');
-                res.status(400).json({ message: 'Esse e-mail já possui um cadastro, faça login!'});
+                return res.status(400).json({ message: 'Esse e-mail já possui um cadastro, faça login!'});
             } 
-            if (resultsCpf.length || resultsCpfFotografo > 0){
+            if (resultsCpf.length || resultsCpfCliente > 0){
                 console.error('erro ao cadastrar o fotografo: CPF já cadastrado');
-                res.status(400).json({message: 'Esse CPF já possui um cadastro, faça login!'})
+               return  res.status(400).json({message: 'Esse CPF já possui um cadastro, faça login!'})
             }
 
             const hashedPassword = await bcrypt.hash(senha, 10);
@@ -80,32 +80,19 @@ module.exports = {
         const {
             nome,
             telefone,
-            email,
             senha,
             CEP,
         } =req.body;
 
+        const {id} = req.params;
+
         try{
-
-            const resultsEmail = await db('fotografo')
-            .where('email', email)
-            .select('*');
-
-            const resultsEmailCliente = await db('cliente')
-            .where('email',email)
-            .select('*');
-
-            if(resultsEmail || resultsEmailCliente > 0){
-                console.error('Impossível alterar dados, email já cadastrado')
-                res.status(400).json({ message: 'Email já cadastrado, favor colocar um email válido.'})
-            }
 
             await db('fotografo')
             .where({id})
             .update({
                 nome,
                 telefone,
-                email,
                 senha,
                 CEP
             });

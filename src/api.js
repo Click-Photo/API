@@ -2,7 +2,7 @@ const express = require('express')
 
 const app = express();
 
-const clienteRoutes = require('./router');
+const clickRoutes = require('./router');
 
 
 app.use(express.json());
@@ -26,7 +26,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/cliente', clienteRoutes);
+app.use('/click', clickRoutes);
 
 const port = process.env.PORT || 3636;
 app.listen(port, () => {
