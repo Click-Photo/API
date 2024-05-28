@@ -6,6 +6,22 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const moment = require('moment');
 
+const transporter =  nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'think.studio.tattoo@gmail.com',
+        pass: 'jsbgujwyvxfapzvq'
+    },
+});
+
+const contato = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'contato.think.studio@gmail.com',
+      pass: 'dwkljpgcgbdllljt',
+    },
+  });
+
 
 module.exports = {
     async getAllClientes(req, res){
@@ -114,7 +130,7 @@ module.exports = {
         const {id} = req.params;
 
         try{
-            //await db('Job').where({idCliente}).del();
+            // await db('Job').where({idCliente}).del();
             await db('cliente').where({id}).del();
             res.status(200).json({ message: 'Cliente excluido com sucesso!'})
         } catch(err){
@@ -159,16 +175,17 @@ module.exports = {
 
             if(result.length < 1){
                 console.log("Token inválido! " + validToken);
-                res.status(404).json({message: 'Token inválido! Favor digite novamente!'});
+                res.status(404).json({message: 'Token inválido! Favor digite novamente!', validToken: false});
             }
 
             await db('token').where({token}).del()
-            validToken = true
+            validToken = true;
             console.log("Token Válido!" + validToken)
-            res.status(200).json({ message: 'Token válido!'})
+            res.status(200).json({ message: 'Token válido: ' + validToken})
+
         } catch(err){
             console.error("Erro na validação de token!", err);
-            res.status(500).json({ message: 'Erro ao validar o token, favor verificar com admnistrador.'})
+            res.status(500).json({ message: 'Erro ao validar o token, favor verificar com admnistrador.', validToken: true});
         }
     },
 
@@ -190,39 +207,31 @@ module.exports = {
         }
     },
 
-    // async autenticacaoLogin(req,res){
-    //     const{email, senha} = req.body;
+    async autenticacaoLogin(req,res){
+        const{email, senha} = req.body;
 
-    //     try{
-    //         const result = await db('clientes').where({email}).select('*');
-    //         const resultFotografo = await db('fotografo').where({email}).select('*');
-    //         const resultAdministrador = await db('admin').where({email}).select('*');
+        try{
+            const result = await db('cliente').where({email}).select('*');
+            const resultFotografo = await db('fotografo').where({email}).select('*');
 
-    //         if(result.length || resultFotografo || resultAdministrador < 1 ){
-    //             res.status(401).json({ message: 'Email não localizado, confira novamente ou cadastra-se'});
+            if (result.length === 0 && resultFotografo.length === 0) {
+                return res.status(401).json({ message: 'Email não localizado, confira novamente ou cadastra-se' });
+            }
+
+            const senhaIncritografada = result[0].senha;
+            const comparaSenha = await bcrypt.compare(senha, senhaIncritografada);
+
+            if (comparaSenha) {
+                 res.json({ auth: true, token, userType: 'cliente', user: result});
+                 return res.status(200).json({ message: 'Login realizado com sucesso! '})
+            }   
+
+            res.status(401).json({message: "Senha inserida incorretamente."})
             
-
-    //         const senhaIncritografada = result[0].senha;
-    //         const comparaSenha = await bcrypt.compare(senha, senhaIncritografada);
-
-    //         if (comparaSenha) {
-    //              res.json({ auth: true, token, userType: 'cliente', user: result});
-    //         }   
-
-    //         res.status(401).json({message: "Senha inserida incorretamente."})
-    //     } else{
-    //         const storedHashPass = resultAdministrador[0].senha;
-    //         const comparaSenha = await bcrypt.compare(senha, storedHashPass);
-            
-    //         if (comparaSenha) {
-    //             //Senha correta para admin
-    //             const token = jwt.sing({userId: resultAdministrador[0].id, userType: 'admin'}, 'jwtSecret',{expiresIn: '1h'})
-    //         }
-    //     }   
-    //     } catch(err){
-    //         console.error("Erro ao redefinir a senha!", err)
-    //         res.status(500).json({message: 'Erro ao redefinir a senha, entre em contato com o administrador.'})
-    //     }
-    // }
+        } catch(err){
+            console.error("Erro ao logar: ", err);
+            res.status(500).json({message: 'Erro ao logar, entre em contato com o administrador. ',err})
+        }
+    }
 
 }
