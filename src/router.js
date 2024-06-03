@@ -11,16 +11,15 @@ const confirmaClienteController = require ('./controllers/ConfirmaCliente');
 const confirmaFotografoController = require ('./controllers/ConfirmaFotografo');
 
 //Rotas de crud cliente:
-router.post('/cadastroCliente', clienteController.createClientes);
 router.post('/alterarCliente/:id',clienteController.updateClientes);
 router.post('/deletarCliente/:id',clienteController.deleteClientes);
 router.post('/visualizarCliente',clienteController.getAllClientes);
 
 //Metódos:
 router.post('/solicitarTrocaSenha',clienteController.requisitarResetSenha);
-router.post('/redefinirSenha/:id',clienteController.resetSenha);
+router.post('/redefinirSenha/:email',clienteController.resetSenha);
 router.post('/autenticacaoCliente',clienteController.autenticacaoLogin);
-router.post('/validaToken',clienteController.verificarToken);
+router.post('/validaTokenCliente',clienteController.verificarToken);
 
 //Rotas do crud ConfirmaCliente:
 router.post('/cadastroConfirmaCliente',confirmaClienteController.createConfirmaCliente);

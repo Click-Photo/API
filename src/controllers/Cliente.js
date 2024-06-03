@@ -34,69 +34,6 @@ module.exports = {
         }
     },
     
-    async createClientes (req, res) {
-        const {
-            nome,
-            telefone,
-            email,
-            CPF,
-            CEP,
-            senha,
-            dataEntrada
-        } = req.body;
-
-        try {
-            const dataAtual = moment().format('YYYY-MM-DD');
-
-            const resultsEmail = await db('cliente')
-            .where('email', email)
-            .select('*');
-
-            const resultsCpf = await db('cliente')
-            .where('CPF', CPF)
-            .select('*');
-
-            const resultsEmailFotografo = await db('fotografo')
-            .where('email',email)
-            .select('*');
-
-            const resultsCpfFotografo = await db('fotografo')
-            .where('CPF', CPF)
-            .select('*');
-
-            
-
-
-            if (resultsEmail.length || resultsEmailFotografo > 0){
-                console.error('erro ao cadastrar o cliente: Cliente já cadastrado');
-                res.status(400).json({ message: 'Esse e-mail já possui um cadastro, faça login!'});
-            } 
-            if (resultsCpf.length || resultsCpfFotografo > 0){
-                console.error('erro ao cadastrar o cliente: CPF já cadastrado');
-                res.status(400).json({message: 'Esse CPF já possui um cadastro, faça login!'})
-            }
-
-            else{
-                const hashedPassword = await bcrypt.hash(senha, 10);
-
-                const [id] = await db('cliente').insert({
-                    nome,
-                    telefone,
-                    email,
-                    CPF,
-                    CEP,
-                    senha: hashedPassword,
-                    dataEntrada : dataAtual
-                });
-    
-                res.status(201).json({id, message: 'cliente cadastrado.'});
-            }
-        }catch(err) {
-            console.error('Erro ao cadastrar o cliente', err);
-            res.status(500).json({ message: 'Não foi possível cadastrar o cliente'});
-        }
-    },
-
     async updateClientes (req,res){
         
         const { id } = req.params;
@@ -105,10 +42,9 @@ module.exports = {
             nome,
             telefone,
             email,
-            senha,
             CEP,
         } = req.body;
-
+        
         try{
             await db('cliente')
             .where({id})
@@ -116,9 +52,9 @@ module.exports = {
                 nome,
                 telefone,
                 email,
-                senha,
                 CEP
             });
+
             res.status(200).json({ message: 'Dados do cliente atualizado com sucesso'})
         } catch (err){
             console.error('Houve um problema para fazer a troca de dados: ',err);
@@ -139,36 +75,90 @@ module.exports = {
         }
     },
 
-    async requisitarResetSenha(req,res){
-        const {email} = req.body;
-        const result = await db('clientes').where({email}).select('*');
+    async  requisitarResetSenha(req, res) {
+    const { email } = req.body;
+    let emailCadastrado = false;
 
-        try {
-            if(result.length < 1){
-                console.log("Email não cadastrado")
-                res.status(400).json({ message: 'Email não cadastrado.'})
-            }
-            
+    try {
+        const resultCliente = await db('cliente').where({ email }).select('*');
+        const resultFotografo = await db('fotografo').where({ email }).select('*');
+
+        console.log(resultCliente);
+        console.log(resultFotografo);
+
+        if (resultCliente.length > 0) {
+            const cliente = await db('cliente').select("id").where({ email }).first();
+            const idCliente = cliente.id;
             const token = crypto.randomBytes(4).toString('hex');
-            await db('token').insert({token});
-
-            await transporter.sendEmail({
-                from: '',
-                to: email,
-                subject: 'Refinição de Senha',
-                text: `Seu código para redefinição de senha é: ${token}`
+            await db('token').insert({
+                idCliente,
+                token
             });
 
-            res.status(200).json({ message: 'Código para redefinição de senha enviado'})
+            await transporter.sendMail({
+                from: 'seu-email@dominio.com',
+                to: email,
+                subject: 'Redefinição de Senha',
+                html: `
+                    <div style="background-color: black; padding: 8px 20px; text-align: center;">
+                        <h2 style="font-size: 24px; color: #fff; font-family: 'Baloo', sans-serif; font-weight: 700;">Click</h2>
+                    </div>
+                    <div style="padding: 20px; background-color: white;">
+                        <p style="font-size: 16px; color: black;">Olá!</p>
+                        <p style="font-size: 16px; color: black;">Esse é seu <strong style="color: black;">Código</strong> para redefinir a sua senha: ${token}!</p>
+                        <p style="font-size: 16px; color: black;"><strong style="color: black;">Click</strong> está à disposição. :)</p>
+                    </div>
+                `,
+            });
 
-        } catch(err){
-            res.status(500).json({ message: 'Houve um erro para enviar o código de redefinição de senha'})
+            emailCadastrado = true;
         }
-    },
+
+        if (resultFotografo.length > 0) {
+            const fotografo = await db('fotografo').select("id").where({ email }).first();
+            const idFotografo = fotografo.id;
+            const token = crypto.randomBytes(4).toString('hex');
+            await db('token').insert({
+                idFotografo,
+                token
+            });
+
+            await transporter.sendMail({
+                from: 'seu-email@dominio.com',
+                to: email,
+                subject: 'Redefinição de Senha',
+                html: `
+                    <div style="background-color: black; padding: 8px 20px; text-align: center;">
+                        <h2 style="font-size: 24px; color: #fff; font-family: 'Baloo', sans-serif; font-weight: 700;">Click</h2>
+                    </div>
+                    <div style="padding: 20px; background-color: white;">
+                        <p style="font-size: 16px; color: black;">Olá!</p>
+                        <p style="font-size: 16px; color: black;">Esse é seu <strong style="color: black;">Código</strong> para redefinir a sua senha: ${token}!</p>
+                        <p style="font-size: 16px; color: black;"><strong style="color: black;">Click</strong> está à disposição. :)</p>
+                    </div>
+                `,
+            });
+
+            emailCadastrado = true;
+        }
+
+        if (!emailCadastrado) {
+            console.log("Email não cadastrado");
+            return res.status(400).json({ message: 'Email não cadastrado.' });
+        }
+        
+        return res.status(200).json({ message: 'Código para redefinição de senha enviado' });
+
+    } catch (err) {
+        console.error('Erro ao enviar o código de redefinição de senha:', err);
+        return res.status(500).json({ message: 'Houve um erro para enviar o código de redefinição de senha' });
+    }
+},
+
 
     async verificarToken (req, res) {
         const { token } = req.body;
-        const validToken = false;
+        let validToken = false;
 
         try{
             const result = await db('token').where({token}).select('*');
@@ -178,7 +168,7 @@ module.exports = {
                 res.status(404).json({message: 'Token inválido! Favor digite novamente!', validToken: false});
             }
 
-            await db('token').where({token}).del()
+            await db('token').where({token}).del();
             validToken = true;
             console.log("Token Válido!" + validToken)
             res.status(200).json({ message: 'Token válido: ' + validToken})
@@ -189,49 +179,69 @@ module.exports = {
         }
     },
 
-    async resetSenha (req, res){
-        const {email} = req.params;
-        const {senha, confirmaSenha} = req.body;
+    async resetSenha(req, res) {
+        const { email } = req.params;
+        console.log(email);
+        const { senha, confirmaSenha } = req.body;
 
-        const criptografia  = await bcrypt.hash(senha, saltRounds);
+        const resultCliente = await db('cliente').where({ email }).select('*');
+        const resultFotografo = await db('fotografo').where({ email }).select('*');
+
+        
+
         try{
             if(senha != confirmaSenha){
-                res.staus(400).json({ message: 'A senha não está igual!'})
+                return res.status(400).json({message: 'Senhas diferentes!'})
             }
 
-            await db('cliente').where({email}).update({senha: criptografia});
-            res.status(200).json({message: "Senha trocada com sucesso!"})
+            if (resultCliente.length){
+                const hashedPass = await bcrypt.hash(senha, saltRounds);
+                await db('cliente').where({email: email}).update({senha: hashedPass})
+                res.status(200).json({message: 'Senha trocada com sucesso!'})
+            }
+            
+            if (resultFotografo.length){
+                const hashedPass = await bcrypt.hash(senha, saltRounds);
+                await db('fotografo').where({emai: emaill}).update({senha: hashedPass})
+                res.status(200).json({message: 'Senha trocada com sucesso!'})
+            }
+            
         } catch (err){
-            console.error("Erro ao redefinir senha!", err);
-            res.status(500).json({ message: 'Algo deu errado ao redefinir a senha!'});
+            console.error("Erro ao redefinir senha! ",err);
+            res.status(500).json({message: 'Erro ao redefinir a senha!'})
         }
     },
 
-    async autenticacaoLogin(req,res){
-        const{email, senha} = req.body;
+    async autenticacaoLogin(req, res) {
 
-        try{
-            const result = await db('cliente').where({email}).select('*');
-            const resultFotografo = await db('fotografo').where({email}).select('*');
-
-            if (result.length === 0 && resultFotografo.length === 0) {
+        const { email, senha } = req.body;
+    
+        try {
+            const resultCliente = await db('cliente').where({ email }).select('*');
+            const resultFotografo = await db('fotografo').where({ email }).select('*');
+    
+            if (resultCliente.length === 0 && resultFotografo.length === 0) {
                 return res.status(401).json({ message: 'Email não localizado, confira novamente ou cadastra-se' });
             }
-
-            const senhaIncritografada = result[0].senha;
+    
+            const user = resultCliente.length > 0 ? resultCliente[0] : resultFotografo[0];
+            const senhaIncritografada = user.senha;
+    
+            console.log('Senha fornecida:', senha);
+            console.log('Senha armazenada (hash):', senhaIncritografada);
+    
             const comparaSenha = await bcrypt.compare(senha, senhaIncritografada);
-
+    
             if (comparaSenha) {
-                 res.json({ auth: true, token, userType: 'cliente', user: result});
-                 return res.status(200).json({ message: 'Login realizado com sucesso! '})
-            }   
-
-            res.status(401).json({message: "Senha inserida incorretamente."})
-            
-        } catch(err){
+                const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
+                return res.json({ auth: true, token, userType: resultCliente.length > 0 ? 'cliente' : 'fotografo', user });
+            } 
+    
+            return res.status(401).json({ message: 'Senha inserida incorretamente.' });
+        } catch (err) {
             console.error("Erro ao logar: ", err);
-            res.status(500).json({message: 'Erro ao logar, entre em contato com o administrador. ',err})
+            res.status(500).json({ message: 'Erro ao logar, entre em contato com o administrador.', err });
         }
-    }
+    },
 
 }
