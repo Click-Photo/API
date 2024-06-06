@@ -45,6 +45,7 @@ module.exports = {
             }
     
             const hashedPass = await bcrypt.hash(senha, saltRounds);
+            const dataEntrada = new Date();
             const [id] = await db('confirmacliente').insert({
                 nome,
                 telefone,
@@ -103,7 +104,8 @@ module.exports = {
                 email,
                 CPF,
                 CEP,
-                senha
+                senha,
+                dataEntrada
             } = await db ('confirmaCliente').where({id: idClienteToken}).first();
 
             const [id] = await db ('cliente').insert({
@@ -112,7 +114,8 @@ module.exports = {
                 email,
                 CPF,
                 CEP,
-                senha
+                senha,
+                dataEntrada
             });
 
             await db ('token').where({token}).del();

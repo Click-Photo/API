@@ -8,8 +8,8 @@ const saltRounds = 10;
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth:{
-        user: ' ',
-        pass: ' '
+        user: 'think.studio.tattoo@gmail.com',
+        pass: ' jsbgujwyvxfapzvq'
     }
 })
 
@@ -36,16 +36,18 @@ module.exports = {
             }
 
             const hashedPass = await bcrypt.hash(senha, saltRounds);
+            const dataEntrada= new Date();
             const [id] = await db ('confirmaFotografo').insert({
                 nome,
                 telefone,
                 email,
                 CPF,
                 CEP,
-                senha: hashedPass
+                senha: hashedPass,
+                dataEntrada
             })
 
-            const token = crypto.randomBytes(3).toString('hex');
+            const token = cryto.randomBytes(3).toString('hex');
 
             await db('token').insert({
                 idCliente: id,
@@ -57,13 +59,13 @@ module.exports = {
                 to: email,
                 subject: 'Criação de Conta',
                 html: `<div style="background-color: black; padding: 8px 20px; text-align: center;">
-                    <h2 style="font-size: 24px; color: #fff; font-family: 'Baloo', sans-serif; font-weight: 700;">Th<span style="color: #EB1CE4; font-weigth: bold;">Ink </span></h2>
-                </div>
-                <div style="padding: 20px;">
-                    <p style="font-size: 16px;">Olá!</p>
-                    <p style="font-size: 16px;">Esse é seu <strong style="color: #EB1CE4;">Código</strong> de acesso: ${token}!</p>
-                    <p>O <strong style="color: #EB1CE4;">ThINK</strong> agradece o seu cadastro :)</p>
-                </div>
+                <h2 style="font-size: 24px; color: #fff; font-family: 'Baloo', sans-serif; font-weight: 700;">Click</h2>
+            </div>
+            <div style="padding: 20px; background-color: white;">
+                <p style="font-size: 16px; color: black;">Olá!</p>
+                <p style="font-size: 16px; color: black;">Esse é seu <strong style="color: black;">Código</strong> de acesso: ${token}!</p>
+                <p style="font-size: 16px; color: black;">O <strong style="color: black;">Click</strong> agradece o seu cadastro :)</p>
+            </div>
             `,
             });
 
@@ -90,20 +92,22 @@ module.exports = {
                 email,
                 CPF,
                 CEP,
-                senha
+                senha,
+                dataEntrada
             } = await db ('confirmaFotografo').where({id: idFotografoToken}).first();
 
-            const [id] =  await db ('cliente').insert({
+            const [id] =  await db ('fotografo').insert({
                 nome,
                 telefone,
                 email,
                 CPF,
                 CEP,
-                senha
+                senha,
+                dataEntrada
             })
 
             await db('token').where({token}).del();
-            await db('confirmaCliente').where({id: idFotografoToken}).del();
+            await db('confirmaFotografo').where({id: idFotografoToken}).del();
 
             res.status(200).json({message: 'Token Válido'});
         }catch(err){

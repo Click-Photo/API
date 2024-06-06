@@ -7,7 +7,7 @@ exports.up = function(knex) {
         table.string('CPF').notNullable();
         table.string('CEP').notNullable();
         table.string('senha').notNullable();
-        table.date('dataEntrada').notNullable();
+        table.timestamp('dataEntrada').notNullable();
     })
 };
 
