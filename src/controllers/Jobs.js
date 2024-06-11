@@ -12,12 +12,25 @@ module.exports = {
         }
     },
 
+    async getAllJobsCliente (req, res){
+        const {id} = req.params;
+        
+        try{
+            const jobs = await db('jobs').select('*').where({id});
+            res.status(200).json(jobs)
+        }catch(err){
+            console.error("Erro ao coletar informações sobre os jobs" , err)
+            res.status(500).json({message: "Erro ao coletar informções! "})
+        }
+    },
+
     async createJob (req, res){
 
 
         const{
-            idFotografo,
+            idCliente,
             dataJob,
+            dataCriacao,
             titulo,
             descricao,
             local,
@@ -28,7 +41,6 @@ module.exports = {
             const dataCriacao = new Date();
             const [id] = await db('jobs').insert({
                 idCliente,
-                idFotografo,
                 dataJob,
                 dataCriacao,
                 titulo,
@@ -36,6 +48,8 @@ module.exports = {
                 local,
                 preco
             })
+
+            res.status(200).json({message: "Job criado!"})
             
         } catch (err){
             console.error("Erro ao criar Job",err);
@@ -54,7 +68,7 @@ module.exports = {
         } = req.body;
 
         try{
-            await db("jobs").where({id}).uptade({
+            await db("jobs").where({id}).update({
                 dataJob,
                 titulo,
                 descricao,
@@ -72,6 +86,8 @@ module.exports = {
     },
     
     async deleteJob(req, res){
+        const {id} = req.params;
+
         try{
             await db ('jobs').where({id}).del();
             res.status(200).json({message: 'Job excluído com sucesso! '})

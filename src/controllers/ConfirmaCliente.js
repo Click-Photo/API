@@ -1,5 +1,5 @@
 const db = require('../database/db');
-const cryto =  require ('crypto');
+const crypto =  require ('crypto');
 const nodemailer = require ('nodemailer');
 const bcrypt = require ('bcrypt');
 const { verificarToken } = require('./Cliente');

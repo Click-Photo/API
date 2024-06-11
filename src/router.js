@@ -10,6 +10,12 @@ const fotografoController = require('./controllers/Fotografo');
 const confirmaClienteController = require ('./controllers/ConfirmaCliente');
 const confirmaFotografoController = require ('./controllers/ConfirmaFotografo');
 const jobsController = require ('./controllers/Jobs')
+const propostaController = require ('./controllers/Proposta');
+
+//Rotas do Controller Proposta
+router.post('/criarProposta/:idJobs',propostaController.createProposta);
+router.post('/visualizarProposta',propostaController.getAllPropostas);
+router.post('/visualizarPropostaCliente/:idCliente',propostaController.getAllPropostaCliente);
 
 //Rotas do Controller Jobs
 router.post('/criarJob',jobsController.createJob);
