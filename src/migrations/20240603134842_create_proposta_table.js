@@ -4,6 +4,7 @@ exports.up = function(knex) {
         table.integer('idJobs').unsigned().notNullable();
         table.integer('idCliente').unsigned().notNullable();
         table.integer('idFotografo').unsigned().notNullable();
+        table.string('status');
 
         table.foreign('idCliente').references('id').inTable('cliente');
         table.foreign('idFotografo').references('id').inTable('fotografo');

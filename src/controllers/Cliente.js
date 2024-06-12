@@ -66,7 +66,7 @@ module.exports = {
         const {id} = req.params;
 
         try{
-            // await db('Job').where({idCliente}).del();
+            await db('jobs').where({idCliente}).del();
             await db('cliente').where({id}).del();
             res.status(200).json({ message: 'Cliente excluido com sucesso!'})
         } catch(err){

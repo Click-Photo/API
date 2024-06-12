@@ -1,4 +1,13 @@
 const db = require ('../database/db');
+const nodemailer = require('nodemailer');
+
+const transporter =  nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'think.studio.tattoo@gmail.com',
+        pass: 'jsbgujwyvxfapzvq'
+    },
+});
 
 module.exports = {
     async getAllPropostas (req,res){
@@ -60,6 +69,69 @@ module.exports = {
         }
     },
 
-    
+    async getAllPropostaFotografo (req,res){
+        const { idFotografo } = req.params;
 
+        
+        try {
+            const  propostas = await db("proposta").select("*").where({idFotografo: idFotografo});
+            res.status(200).json(propostas)
+        } catch (error) {
+            console.log("Erro ao buscar propostas: ", error);
+            res.status(500).json({message: "Erro ao buscar propostas"});
+        }
+    },
+
+    async aceitarProposta (req, res){
+        const {id} = req.params;
+        const {idJobs, idFotografo} = req.body;
+        try{
+            await db('jobs').where('id', idJobs).update({
+                status: "Aceito",
+                idFotografo
+            });
+
+            await db('proposta').where({id}).update({
+                status: 'Aceito'
+            })
+
+            const email = await db('fotografo').select('email').where({id:idFotografo});         
+            
+            await transporter.sendEmail({
+                from:'',
+                to: email,
+                subject: 'Atualização de proposta!',
+                html: `
+                    <div style="background-color: black; padding: 8px 20px; text-align: center;">
+                        <h2 style="font-size: 24px; color: #fff; font-family: 'Baloo', sans-serif; font-weight: 700;">Click</h2>
+                    </div>
+                    <div style="padding: 20px; background-color: white;">
+                        <p style="font-size: 16px; color: black;">Olá!</p>
+                        <p style="font-size: 16px; color: black;">Uma de suas propostas foi aceita, entre na sua conta para verificar</p>
+                        <p style="font-size: 16px; color: black;"><strong style="color: black;">Click</strong> está à disposição. :)</p>
+                    </div>
+                `,
+            })
+
+            return res.status(200).json({message: "Proposta aceita com sucesso! "})
+        }  catch (err) {
+            console.error("Erro ao aceitar proposta", err);
+            res.status(500).json({message: "Erro ao aceitar proposta"});
+        }
+    },
+
+    async recusarProposta (req, res){
+        const {id} = req.params;
+        
+        try{
+            await db('proposta').where({id}).update({
+                status: "Recusado"
+            });
+
+            res.status(200).json({message: "Job recusado com sucesso"})
+        }catch(err){
+            console.error('Erro ao recusar a proposta', err)
+            res.status(500).json({message: 'Erro ao recusar a proposta! '})
+        }
+    }
 }

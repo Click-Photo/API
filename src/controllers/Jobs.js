@@ -95,6 +95,5 @@ module.exports = {
             console.error('Erro ao excluir job', err)
             res.status(500).json({message: 'Erro ao realizar a exclusão do job'});
         }
-    },
-
+    }
 }

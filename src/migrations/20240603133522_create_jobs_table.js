@@ -8,6 +8,7 @@ exports.up = function(knex) {
         table.string("titulo").notNullable();
         table.string("descricao").notNullable();
         table.string("local").notNullable();
+        table.string('status');
         table.string("preco").notNullable();
 
         table.foreign('idCliente').references('id').inTable('cliente');

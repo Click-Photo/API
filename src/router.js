@@ -16,6 +16,9 @@ const propostaController = require ('./controllers/Proposta');
 router.post('/criarProposta/:idJobs',propostaController.createProposta);
 router.post('/visualizarProposta',propostaController.getAllPropostas);
 router.post('/visualizarPropostaCliente/:idCliente',propostaController.getAllPropostaCliente);
+router.post('/visualizarPropostaFotografo/:id',propostaController.getAllPropostaFotografo);
+router.post('/aceitarProposta/:id', propostaController.aceitarProposta);
+router.post('/recusarProposta/:id', propostaController.recusarProposta);
 
 //Rotas do Controller Jobs
 router.post('/criarJob',jobsController.createJob);
