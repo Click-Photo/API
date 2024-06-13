@@ -6,7 +6,7 @@ const transporter =  nodemailer.createTransport({
     auth: {
         user: 'think.studio.tattoo@gmail.com',
         pass: 'jsbgujwyvxfapzvq'
-    },
+    }
 });
 
 module.exports = {
@@ -86,6 +86,7 @@ module.exports = {
         const {id} = req.params;
         const {idJobs, idFotografo} = req.body;
         try{
+
             await db('jobs').where('id', idJobs).update({
                 status: "Aceito",
                 idFotografo
@@ -95,9 +96,13 @@ module.exports = {
                 status: 'Aceito'
             })
 
-            const email = await db('fotografo').select('email').where({id:idFotografo});         
-            
-            await transporter.sendEmail({
+            const emailResult = await db('fotografo').select('email').where({ id: idFotografo });
+            const email = emailResult.length > 0 ? emailResult[0].email : null;
+
+            if (!email) {
+                return res.status(400).json({ message: "Fotógrafo não encontrado ou email não disponível" });
+            }
+            await transporter.sendMail({
                 from:'',
                 to: email,
                 subject: 'Atualização de proposta!',
