@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ dest: 'uploads/' });
 
 //Rotas
 const clienteController = require('./controllers/Cliente');
@@ -11,6 +11,8 @@ const confirmaClienteController = require ('./controllers/ConfirmaCliente');
 const confirmaFotografoController = require ('./controllers/ConfirmaFotografo');
 const jobsController = require ('./controllers/Jobs')
 const propostaController = require ('./controllers/Proposta');
+const avaliacoesController = require('./controllers/Avaliacoes');
+const portfolioController = require('./controllers/Portfolio');
 
 //Rotas do Controller Proposta
 router.post('/criarProposta/:idJobs',propostaController.createProposta);
@@ -29,6 +31,7 @@ router.post('/visualizarJobs',jobsController.getAllJobs);
 router.post('/finalizarJob/:id',jobsController.finalizarJob)
 
 //Rotas de Controller cliente:
+router.post('/cadastroCliente', clienteController.criarCliente); //Provisório para testes rápidos
 router.post('/alterarCliente/:id',clienteController.updateClientes);
 router.post('/deletarCliente/:id',clienteController.deleteClientes);
 router.post('/visualizarCliente',clienteController.getAllClientes);
@@ -53,5 +56,20 @@ router.post('/cadastroFotografo',fotografoController.createFotografo);
 router.post('/alterarFotografo/:id',fotografoController.updateFotografo);
 router.post('/deletarfotografo/:id',fotografoController.deleteFotografo);
 router.post('/visualizarFotografo',fotografoController.getAllFotografos);
+
+//Rotas do Controller Avaliacoes
+router.get('/avaliacoesPendentesCliente/:clienteId', avaliacoesController.getAvaliacoesPendentesCliente);
+router.get('/avaliacoesPendentesFotografo/:fotografoId', avaliacoesController.getAvaliacoesPendentesFotografo);
+router.get('/mediaAvaliacoesCliente/:clienteId', avaliacoesController.mediaAvaliacoesCliente);
+router.get('/mediaAvaliacoesFotografo/:fotografoId', avaliacoesController.mediaAvaliacoesFotografo);
+router.post('/avaliarFotografo/:jobId', avaliacoesController.avaliarFotografo);
+router.post('/avaliarCliente/:jobId', avaliacoesController.avaliarCliente);
+
+//Rotas do Controller Portfolio
+router.get('/listarTodasFotos', portfolioController.listarFotosGeral);
+router.get('/listarFotosFotografo/:fotografoId', portfolioController.listarFotosFotografo);
+router.post('/adicionarFoto', upload.single('foto'), portfolioController.adicionarFoto);
+router.put('/editarInfoFoto/:idFoto', portfolioController.editarInfoFoto);
+router.delete('/deleteFoto/:fotoId', portfolioController.deleteFoto);
 
 module.exports = router;

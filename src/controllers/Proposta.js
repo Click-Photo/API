@@ -34,10 +34,9 @@ module.exports = {
             const validarJob = await db('jobs').select('status').where('id',idJobs)
             const statusJob = validarJob[0].status
 
-            if(statusJob == "Aceito"){
-                return res.status(400).json({message: "Job com o status aceito!"})
+            if(statusJob == "Aceito" || statusJob == "Finalizado"){
+                return res.status(400).json({message: "Job com o status aceito ou finalizado não pode receber mais propostas!"})
             }
-
 
             const {id} = await db('proposta')
             .insert({

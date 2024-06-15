@@ -33,6 +33,30 @@ module.exports = {
             res.status(500).json({message: "Clietes não encontrados"})
         }
     },
+
+    async criarCliente(req, res) {
+        const { nome, telefone, email, CPF, CEP, senha } = req.body;
+        
+        try {
+            const hashedPassword = await bcrypt.hash(senha, 10);
+            const dataAtual = moment().format('YYYY-MM-DD');
+
+            const [id] = await db('cliente').insert({
+                nome,
+                telefone,
+                email,
+                CPF,
+                CEP,
+                senha : hashedPassword,
+                dataEntrada : dataAtual
+            }); 
+        
+            res.status(201).json({ id, message: 'Cliente criado com sucesso!' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Erro ao criar cliente.');
+        }
+    },
     
     async updateClientes (req,res){
         

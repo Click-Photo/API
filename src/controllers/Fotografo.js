@@ -68,7 +68,7 @@ module.exports = {
                 dataEntrada : dataAtual
             });
 
-            res.status(201).json({id, message: 'Cliente cadastrado.'});
+            res.status(201).json({id, message: 'Fotografo cadastrado.'});
 
         } catch(err){
             console.error('Erro ao criar fotografo!', err)

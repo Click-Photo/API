@@ -4,7 +4,7 @@ module.exports = {
 
     async getAllJobs (req, res){
         try{
-            const jobs = await db('jobs').select('*');
+            const jobs = await db('jobs').select('*').whereNot('status', 'Finalizado');
             res.status(200).json(jobs)
         }catch(err){
             console.error("Erro ao coletar informações sobre os jobs" , err)
@@ -25,8 +25,6 @@ module.exports = {
     },
 
     async createJob (req, res){
-
-
         const{
             idCliente,
             dataJob,
@@ -46,6 +44,7 @@ module.exports = {
                 titulo,
                 descricao,
                 local,
+                status: 'Pendente',
                 preco
             })
 
@@ -101,7 +100,22 @@ module.exports = {
     async finalizarJob(req, res){
         const {id} = req.params;
         try{
-            await db ('propostas').select('*').where('idJobs',id).del()
+            await db("jobs").where({id}).update({
+                status: "Finalizado"
+            });
+
+            const job = await db('jobs').where('id', id).first();
+
+            await db('avaliacoes').insert({
+                jobId: id,
+                clienteId: job.idCliente,
+                fotografoId: job.idFotografo,
+                clienteAvaliado: false,
+                fotografoAvaliado: false
+            });
+        
+
+            await db ('proposta').select('*').where('idJobs',id).del()
             res.status(200).json({message: 'Job finalizado com sucesso.'})
         } catch(err){
             console.error('Erro ao finalizar job', err)
