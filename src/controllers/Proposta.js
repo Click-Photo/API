@@ -30,7 +30,16 @@ module.exports = {
         } = req.body;
 
         try{
-            const  [id] = await db('proposta')
+
+            const validarJob = await db('jobs').select('status').where('id',idJobs)
+            const statusJob = validarJob[0].status
+
+            if(statusJob == "Aceito"){
+                return res.status(400).json({message: "Job com o status aceito!"})
+            }
+
+
+            const {id} = await db('proposta')
             .insert({
                 idJobs,
                 idCliente,
@@ -82,10 +91,42 @@ module.exports = {
         }
     },
 
+    async getAllPropostaJob(req,res){
+        const { idJobs } = req.params;
+        
+        
+        try{
+            const validarJob = await db('jobs').select('status').where('id',idJobs)
+            const statusJob = validarJob[0].status
+
+            if(statusJob == "Aceito"){
+                return res.status(400).json({message: "Job com o status aceito!"})
+            }
+
+            const propostas = await db('proposta').select('*').where('idJobs', idJobs);
+            res.status(200).json(propostas);
+        } catch (err){
+            console.error('Propostas não encontradas', err);
+             res.status(500).json({message: 'Propostas não encontradas.'})
+        }
+    },
+
     async aceitarProposta (req, res){
         const {id} = req.params;
         const {idJobs, idFotografo} = req.body;
+
+        
         try{
+
+            const validarJob = await db('jobs').select('status').where('id', idJobs);
+            const validarProposta = await db('proposta').select('status').where('id', id);
+
+            const statusJob = validarJob[0].status
+            const statusProposta = validarProposta[0].status
+
+            if (statusJob == "Aceito" || statusProposta == "Aceito"){
+                return res.status(400).json({message: "Job com o status aceito!"})
+            }
 
             await db('jobs').where('id', idJobs).update({
                 status: "Aceito",
@@ -138,5 +179,5 @@ module.exports = {
             console.error('Erro ao recusar a proposta', err)
             res.status(500).json({message: 'Erro ao recusar a proposta! '})
         }
-    }
+    },
 }

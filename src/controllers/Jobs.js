@@ -90,10 +90,22 @@ module.exports = {
 
         try{
             await db ('jobs').where({id}).del();
+            await db ('propostas').where('idJobs',id).del();
             res.status(200).json({message: 'Job excluído com sucesso! '})
         } catch (err){
             console.error('Erro ao excluir job', err)
             res.status(500).json({message: 'Erro ao realizar a exclusão do job'});
+        }
+    },
+
+    async finalizarJob(req, res){
+        const {id} = req.params;
+        try{
+            await db ('propostas').select('*').where('idJobs',id).del()
+            res.status(200).json({message: 'Job finalizado com sucesso.'})
+        } catch(err){
+            console.error('Erro ao finalizar job', err)
+            res.status(500).json({message: 'Erro ao finalizar job'})
         }
     }
 }
