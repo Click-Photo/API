@@ -2,25 +2,46 @@ const db = require('../database/db');
 
 module.exports = {
 
-    async getAllJobs (req, res){
-        try{
-            const jobs = await db('jobs').select('*').whereNot('status', 'Finalizado');
-            res.status(200).json(jobs)
-        }catch(err){
-            console.error("Erro ao coletar informações sobre os jobs" , err)
-            res.status(500).json({message: "Erro ao coletar informções! "})
+    async getAllJobs (req, res) {
+        try {
+            const jobs = await db('jobs')
+                .select('jobs.*', 'cliente.nome as nomeCliente')
+                .join('cliente', 'jobs.idCliente', '=', 'cliente.id')
+                .whereNot('jobs.status', 'Finalizado');
+            res.status(200).json(jobs);
+        } catch (err) {
+            console.error("Erro ao coletar informações sobre os jobs", err);
+            res.status(500).json({ message: "Erro ao coletar informações!" });
         }
     },
 
-    async getAllJobsCliente (req, res){
-        const {id} = req.params;
+    async getAllJobsCliente (req, res) {
+        const { id } = req.params;
         
-        try{
-            const jobs = await db('jobs').select('*').where({id});
-            res.status(200).json(jobs)
-        }catch(err){
-            console.error("Erro ao coletar informações sobre os jobs" , err)
-            res.status(500).json({message: "Erro ao coletar informções! "})
+        try {
+            const jobs = await db('jobs').select('*').where({ idCliente: id });
+    
+            const [{ totalJobs }] = await db('jobs').where({ idCliente: id }).count('id as totalJobs');
+    
+            res.status(200).json({ jobs, totalJobs });
+        } catch (err) {
+            console.error("Erro ao coletar informações sobre os jobs", err);
+            res.status(500).json({ message: "Erro ao coletar informações!" });
+        }
+    },
+
+    async getJobsFotografo (req, res) {
+        const { id } = req.params;
+        
+        try {
+            const jobs = await db('jobs').select('*').where({ idFotografo: id });
+    
+            const [{ totalJobs }] = await db('jobs').where({ idFotografo: id }).count('id as totalJobs');
+    
+            res.status(200).json({ jobs, totalJobs });
+        } catch (err) {
+            console.error("Erro ao coletar informações sobre os jobs", err);
+            res.status(500).json({ message: "Erro ao coletar informações!" });
         }
     },
 

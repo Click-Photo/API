@@ -111,11 +111,13 @@ module.exports = {
                     'fotografoId': fotografoId,
                     'clienteAvaliado': true
                 })
-                .avg("notaFotografo as mediaNota");
+                .avg("notaFotografo as mediaNota")
+                .count("notaFotografo as totalAvaliacoes");
             
             const mediaNota = result[0].mediaNota ? parseFloat(result[0].mediaNota).toFixed(1) : 'Sem avaliações';
+            const totalAvaliacoes = result[0].totalAvaliacoes;
 
-            res.status(200).json(mediaNota);
+            res.status(200).json({ mediaNota, totalAvaliacoes });
 
         }catch(err){
             console.log("Erro ao buscar a média da nota do fotografo: ", err);
@@ -132,11 +134,13 @@ module.exports = {
                     'clienteId': clienteId,
                     'fotografoAvaliado': true
                 })
-                .avg("notaFotografo as mediaNota");
+                .avg("notaCliente as mediaNota")
+                .count("notaCliente as totalAvaliacoes");
             
             const mediaNota = result[0].mediaNota ? parseFloat(result[0].mediaNota).toFixed(1) : 'Sem avaliações';
+            const totalAvaliacoes = result[0].totalAvaliacoes;
 
-            res.status(200).json(mediaNota);
+            res.status(200).json({ mediaNota, totalAvaliacoes });
 
         }catch(err){
             console.log("Erro ao buscar a média da nota do cliente: ", err);

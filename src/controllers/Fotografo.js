@@ -17,6 +17,18 @@ module.exports = {
         }
     },
 
+    async getEspecifFotografo(req, res){
+        const { id } = req.params;
+
+        try{
+            const fotografo = await db('fotografo').select('*').where({ id });
+            res.status(200).json(fotografo);
+        } catch(err){
+            console.error('fotografos não encontrados', err);
+            res.status(500).json({message: "fotografos não encontrados"})
+        }
+    },
+
     async createFotografo (req, res) {
         const{
             nome,
@@ -86,6 +98,8 @@ module.exports = {
 
         const {id} = req.params;
 
+        const hashedPassword = await bcrypt.hash(senha, 10);
+
         try{
 
             await db('fotografo')
@@ -93,7 +107,7 @@ module.exports = {
             .update({
                 nome,
                 telefone,
-                senha,
+                senha: hashedPassword,
                 CEP
             });
 

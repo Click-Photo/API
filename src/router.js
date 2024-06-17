@@ -13,6 +13,7 @@ const jobsController = require ('./controllers/Jobs')
 const propostaController = require ('./controllers/Proposta');
 const avaliacoesController = require('./controllers/Avaliacoes');
 const portfolioController = require('./controllers/Portfolio');
+const interesseController = require('./controllers/Interesses');
 
 //Rotas do Controller Proposta
 router.post('/criarProposta/:idJobs',propostaController.createProposta);
@@ -22,19 +23,23 @@ router.post('/visualizarPropostaFotografo/:idFotografo',propostaController.getAl
 router.post('/visulizarPropostaJob/:idJobs',propostaController.getAllPropostaJob);
 router.post('/aceitarProposta/:id', propostaController.aceitarProposta);
 router.post('/recusarProposta/:id', propostaController.recusarProposta);
+router.get('/getPropostaJob/:idJob', propostaController.getPropostaJob);
 
 //Rotas do Controller Jobs
 router.post('/criarJob',jobsController.createJob);
 router.post('/editarJob/:id',jobsController.updateJob);
 router.post('/deleteJob/:id',jobsController.deleteJob);
 router.post('/visualizarJobs',jobsController.getAllJobs);
-router.post('/finalizarJob/:id',jobsController.finalizarJob)
+router.get('/getAllJobsCliente/:id', jobsController.getAllJobsCliente);
+router.post('/finalizarJob/:id',jobsController.finalizarJob);
+router.get('/getJobsFotografo/:id', jobsController.getJobsFotografo);
 
 //Rotas de Controller cliente:
 router.post('/cadastroCliente', clienteController.criarCliente); //Provisório para testes rápidos
 router.post('/alterarCliente/:id',clienteController.updateClientes);
 router.post('/deletarCliente/:id',clienteController.deleteClientes);
 router.post('/visualizarCliente',clienteController.getAllClientes);
+router.get('/getEspecifCliente/:id', clienteController.getEspecifCliente);
 
 //Metódos:
 router.post('/solicitarTrocaSenha',clienteController.requisitarResetSenha);
@@ -56,6 +61,7 @@ router.post('/cadastroFotografo',fotografoController.createFotografo);
 router.post('/alterarFotografo/:id',fotografoController.updateFotografo);
 router.post('/deletarfotografo/:id',fotografoController.deleteFotografo);
 router.post('/visualizarFotografo',fotografoController.getAllFotografos);
+router.get('/getEspecifFotografo/:id', fotografoController.getEspecifFotografo);
 
 //Rotas do Controller Avaliacoes
 router.get('/avaliacoesPendentesCliente/:clienteId', avaliacoesController.getAvaliacoesPendentesCliente);
@@ -71,5 +77,9 @@ router.get('/listarFotosFotografo/:fotografoId', portfolioController.listarFotos
 router.post('/adicionarFoto', upload.single('foto'), portfolioController.adicionarFoto);
 router.put('/editarInfoFoto/:idFoto', portfolioController.editarInfoFoto);
 router.delete('/deleteFoto/:fotoId', portfolioController.deleteFoto);
+
+//Rotas do Controller Interesse
+router.post('/marcarInteresse/:idJob', interesseController.marcarInteresse);
+router.get('/getInteressesFotografo/:idFotografo', interesseController.getInteressesFotografo);
 
 module.exports = router;

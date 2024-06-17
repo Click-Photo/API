@@ -34,6 +34,18 @@ module.exports = {
         }
     },
 
+    async getEspecifCliente(req, res){
+        const { id } = req.params;
+
+        try{
+            const clientes = await db('cliente').select('*').where({ id });
+            res.status(200).json(clientes);
+        } catch(err){
+            console.error('clientes não encontrados', err);
+            res.status(500).json({message: "Clietes não encontrados"})
+        }
+    },
+
     async criarCliente(req, res) {
         const { nome, telefone, email, CPF, CEP, senha } = req.body;
         
@@ -68,7 +80,7 @@ module.exports = {
             email,
             CEP,
         } = req.body;
-        
+
         try{
             await db('cliente')
             .where({id})

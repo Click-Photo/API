@@ -28,14 +28,23 @@ module.exports = {
 
     async listarFotosGeral(req, res) {
         try {
-            const fotos = await db('portfolio').select('*');
+            const fotos = await db('portfolio')
+                .join('fotografo', 'portfolio.fotografoId', 'fotografo.id')
+                .select(
+                    'portfolio.id as portfolioId',
+                    'portfolio.fotoUrl',
+                    'portfolio.descricao',
+                    'fotografo.id as fotografoId',
+                    'fotografo.nome as fotografoNome'
+                );
+    
             res.status(200).json(fotos);
         } catch (error) {
             console.error("Erro ao listar todas as fotos do portfólio: ", error);
             res.status(500).json({ message: "Erro ao listar todas as fotos do portfólio", error: error.message });
         }
     },
-
+    
     async listarFotosFotografo(req, res) {
         const fotografoId = req.params.fotografoId;
 

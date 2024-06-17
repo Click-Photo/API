@@ -64,16 +64,74 @@ module.exports = {
         }
     },
 
-    async getAllPropostaCliente (req,res){
+    async getAllPropostaCliente(req, res) {
         const { idCliente } = req.params;
-
-        
+    
         try {
-            const  propostas = await db("proposta").select("*").where({idCliente: idCliente});
-            res.status(200).json(propostas)
+            // Seleciona todas as propostas feitas pelo cliente, juntando com as informações do job e do fotógrafo
+            const propostas = await db('proposta')
+                .join('jobs', 'proposta.idJobs', 'jobs.id')
+                .join('fotografo', 'proposta.idFotografo', 'fotografo.id')
+                .select(
+                    'proposta.id',
+                    'proposta.idJobs',
+                    'proposta.idCliente',
+                    'proposta.idFotografo',
+                    'proposta.status',
+                    'jobs.dataJob',
+                    'jobs.preco',
+                    'fotografo.nome as nomeFotografo'
+                )
+                .where({ 'proposta.idCliente': idCliente });
+    
+            // Conta o total de propostas para cada job do cliente
+            const totalPropostasPorJob = await db('proposta')
+                .select('idJobs')
+                .count('idJobs as totalPropostas')
+                .groupBy('idJobs')
+                .where({ idCliente: idCliente });
+    
+            // Mapeia as propostas incluindo a contagem de propostas para cada job
+            const propostasComContagem = propostas.map(proposta => {
+                const contagem = totalPropostasPorJob.find(tp => tp.idJobs === proposta.idJobs);
+                return { ...proposta, totalPropostas: contagem ? contagem.totalPropostas : 0 };
+            });
+    
+            res.status(200).json(propostasComContagem);
         } catch (error) {
             console.log("Erro ao buscar propostas: ", error);
-            res.status(500).json({message: "Erro ao buscar propostas"});
+            res.status(500).json({ message: "Erro ao buscar propostas" });
+        }
+    },
+
+    async getPropostaJob(req, res) {
+        const { idJob } = req.params;
+    
+        try {
+            // Seleciona todas as propostas feitas pelo cliente, juntando com as informações do job e do fotógrafo
+            const propostas = await db('proposta')
+                .join('jobs', 'proposta.idJobs', 'jobs.id')
+                .join('fotografo', 'proposta.idFotografo', 'fotografo.id')
+                .select(
+                    'proposta.id',
+                    'proposta.idJobs',
+                    'proposta.idCliente',
+                    'proposta.idFotografo',
+                    'proposta.status',
+                    'jobs.dataJob',
+                    'jobs.preco',
+                    'fotografo.nome as nomeFotografo'
+                )
+                .where({ 'proposta.idJobs': idJob })
+                .andWhere(builder => {
+                    builder.whereNot({ 'proposta.status': 'Recusado' })
+                           .orWhereNull('proposta.status');
+                });
+    
+            res.status(200).json(propostas);
+        } catch (error) {
+            console.log("Erro ao buscar propostas: ", error);
+            res.status(500).json({ message: "Erro ao buscar propostas" });
         }
     },
 
@@ -112,9 +170,8 @@ module.exports = {
 
     async aceitarProposta (req, res){
         const {id} = req.params;
-        const {idJobs, idFotografo} = req.body;
+        const {idJobs, idFotografo, nomeCliente, telefoneCliente } = req.body;
 
-        
         try{
 
             const validarJob = await db('jobs').select('status').where('id', idJobs);
@@ -152,7 +209,7 @@ module.exports = {
                     </div>
                     <div style="padding: 20px; background-color: white;">
                         <p style="font-size: 16px; color: black;">Olá!</p>
-                        <p style="font-size: 16px; color: black;">Uma de suas propostas foi aceita, entre na sua conta para verificar</p>
+                        <p style="font-size: 16px; color: black;">A proposta feita para o Job de ${nomeCliente} foi aceita, entre em contato pelo número ${telefoneCliente}.</p>
                         <p style="font-size: 16px; color: black;"><strong style="color: black;">Click</strong> está à disposição. :)</p>
                     </div>
                 `,
@@ -167,10 +224,30 @@ module.exports = {
 
     async recusarProposta (req, res){
         const {id} = req.params;
+        const { idFotografo, nomeCliente } = req.body;
         
         try{
+            const emailResult = await db('fotografo').select('email').where({ id: idFotografo });
+            const email = emailResult.length > 0 ? emailResult[0].email : null;
+
             await db('proposta').where({id}).update({
                 status: "Recusado"
+            });
+
+            await transporter.sendMail({
+                from:'',
+                to: email,
+                subject: 'Atualização de proposta.',
+                html: `
+                    <div style="background-color: black; padding: 8px 20px; text-align: center;">
+                        <h2 style="font-size: 24px; color: #fff; font-family: 'Baloo', sans-serif; font-weight: 700;">Click</h2>
+                    </div>
+                    <div style="padding: 20px; background-color: white;">
+                        <p style="font-size: 16px; color: black;">Olá!</p>
+                        <p style="font-size: 16px; color: black;">A proposta feita para o Job de ${nomeCliente} foi recusada, agradecemos pelo seu interesse.</p>
+                        <p style="font-size: 16px; color: black;"><strong style="color: black;">Click</strong> está à disposição. :)</p>
+                    </div>
+                `,
             });
 
             res.status(200).json({message: "Job recusado com sucesso"})
