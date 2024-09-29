@@ -59,6 +59,7 @@ module.exports = {
             const token = crypto.randomBytes(3).toString('hex');
     
             await db('token').insert({
+                idFotografo: 0,
                 idCliente: id,
                 token
             });
@@ -126,5 +127,11 @@ module.exports = {
             console.error("Erro ao verificar o token ", err);
             res.status(500).json({message: "Algo deu errado ao verificar o token"})
          }
-     } 
+     },
+
+     async teste(req,res){
+        const {mensagem} = req.body
+         console.log("Teste");
+         res.status(200).json({mensagem})
+     }
 }

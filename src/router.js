@@ -49,6 +49,7 @@ router.post('/validaTokenCliente',clienteController.verificarToken);
 
 //Rotas do Controller ConfirmaCliente:
 router.post('/cadastroConfirmaCliente',confirmaClienteController.createConfirmaCliente);
+router.post('/teste',confirmaClienteController.teste)
 router.post('/verificarTokenConfirmaCliente',confirmaClienteController.verificarTokenConfirmaCliente);
 
 //Rotas do Controller confirmaFotografo
