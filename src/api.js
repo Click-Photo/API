@@ -1,4 +1,6 @@
 const express = require('express')
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -27,7 +29,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/click', clickRoutes);
+app.use(cookieParser('/click', clickRoutes));
 
 const port = process.env.PORT || 3636;
 app.listen(port, () => {
