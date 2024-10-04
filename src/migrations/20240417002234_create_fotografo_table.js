@@ -8,6 +8,7 @@ exports.up = function(knex) {
         table.string('CEP').notNullable();
         table.string('senha').notNullable();
         table.string('nota');
+        table.string('stripeAccountId');
         table.timestamp('dataEntrada').notNullable();
     })
 };

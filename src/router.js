@@ -59,6 +59,7 @@ router.post('/verificarTokenConfirmaFotografo',confirmaFotografoController.verif
 
 //Rotas de Controller  fotografo:
 router.post('/cadastroFotografo',fotografoController.createFotografo);
+router.post('/createAccountLink',fotografoController.createAccountLink);
 router.post('/alterarFotografo/:id',fotografoController.updateFotografo);
 router.post('/deletarfotografo/:id',fotografoController.deleteFotografo);
 router.post('/visualizarFotografo',fotografoController.getAllFotografos);

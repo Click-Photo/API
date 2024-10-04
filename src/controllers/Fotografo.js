@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const moment = require('moment');
+require('dotenv').config();
+const stripe = require('stripe')(`${process.env.STRIPE_KEY_TEST}`);
 
 module.exports = {
     async getAllFotografos (req, res) {
@@ -70,6 +72,12 @@ module.exports = {
 
             const hashedPassword = await bcrypt.hash(senha, 10);
 
+            const account = await stripe.accounts.create({
+                type: 'express',
+                country: 'BR',
+                email: email,
+            });
+
             const {id} = await db('fotografo').insert({
                 nome,
                 telefone,
@@ -77,7 +85,8 @@ module.exports = {
                 CPF,
                 CEP,
                 senha : hashedPassword,
-                dataEntrada : dataAtual
+                dataEntrada : dataAtual,
+                stripeAccountId: account.id
             });
 
             res.status(201).json({id, message: 'Fotografo cadastrado.'});
@@ -85,6 +94,24 @@ module.exports = {
         } catch(err){
             console.error('Erro ao criar fotografo!', err)
             res.status(500).json({message: 'Não foi possível cadastrar o fotografo.'});
+        }
+    },
+
+    async createAccountLink(req, res) {
+        const { stripeAccountId } = req.body;
+    
+        try {
+            const accountLink = await stripe.accountLinks.create({
+                account: stripeAccountId,
+                refresh_url: 'http://localhost:3636/reauth',  
+                return_url: 'http://localhost:3636/return', 
+                type: 'account_onboarding', 
+            });
+    
+            res.status(200).json({ url: accountLink.url });
+        } catch (err) {
+            console.error('Erro ao criar link de onboarding do Stripe', err);
+            res.status(500).json({ message: 'Erro ao criar link de onboarding' });
         }
     },
 
