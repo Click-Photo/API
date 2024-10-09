@@ -40,8 +40,8 @@ module.exports = {
         }
     },
 
-    async createUser(req,res){
-        const{nome,telefone,email,CPF,CEP,senha,role} = req.body;
+    async createUser(user){
+        const{nome,telefone,email,CPF,CEP,senha,role} = user;
         
         try{
             const hashedPassword = await bcrypt.hash(senha, 10);
@@ -59,26 +59,22 @@ module.exports = {
             });
 
             if(role === 1){
-                res.status(200).json({admin, message: 'Administrador criado'})
+                return { id, message: 'Administrador criado' };
             }
             
             if (role === 2){
-                const fotografo = await db('fotografo').insert({
-                    id_user: id
-                })
-                res.status(200).json({fotografo, message: 'Fotografo criado'})
+                await db('fotografo').insert({ id_user: id });
+                return { id, message: 'Fotografo criado' };
             }
 
             if(role === 3){
-                const cliente = await db('cliente').insert({
-                    id_user: id
-                })
-                res.status(200).json({cliente, message: 'Cliente criado'})
+                await db('cliente').insert({ id_user: id });
+                return { id, message: 'Cliente criado' };
             }
             
         } catch(err){
-            console.error('Erro ao cadastrar usuário', err)
-            res.status(500).json({message: 'Não foi possível cadastrar o usuário.'});
+            console.error('Erro ao cadastrar usuário', err);
+            throw new Error('Não foi possível cadastrar o usuário.');
         }
     },
 

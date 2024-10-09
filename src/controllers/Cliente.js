@@ -260,7 +260,7 @@ module.exports = {
                 return res.status(401).json({ message: 'Email não localizado, confira novamente ou cadastra-se' });
             }
     
-            const user = resultCliente.length > 0 ? resultCliente[0] : resultFotografo[0];
+            const user = resltCliente.length > 0 ? resultCliente[0] : resultFotografo[0];
             const senhaIncritografada = user.senha;
     
             console.log('Senha fornecida:', senha);
@@ -272,7 +272,7 @@ module.exports = {
                 const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
                 return res.json({ auth: true, token, userType: resultCliente.length > 0 ? 'cliente' : 'fotografo', user });
             } 
-    
+    u
             return res.status(401).json({ message: 'Senha inserida incorretamente.' });
         } catch (err) {
             console.error("Erro ao logar: ", err);

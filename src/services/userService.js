@@ -5,8 +5,8 @@ module.exports = {
         return await UserRepository.getAllUsers()
     },
 
-    async createUser(){
-        return await UserRepository.createUser()
+    async createUser(user){
+        return await UserRepository.createUser(user)
     },
 
     async updateUser(){

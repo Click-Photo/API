@@ -14,6 +14,10 @@ const propostaController = require ('./controllers/Proposta');
 const avaliacoesController = require('./controllers/Avaliacoes');
 const portfolioController = require('./controllers/Portfolio');
 const interesseController = require('./controllers/Interesses');
+const userController = require('./controllers/User');
+
+//Rotas do Controller User
+router.post('/criarUser',userController.createUser);
 
 //Rotas do Controller Proposta
 router.post('/criarProposta/:idJobs',propostaController.createProposta);

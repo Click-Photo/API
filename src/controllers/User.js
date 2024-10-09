@@ -11,13 +11,14 @@ module.exports = {
         }
     },
 
-    async createUser(){
+    async createUser(req,res){
         try{
             const user = req.body;
             const createUser = await  UserService.createUser(user);
             res.status(201).json(createUser);
         } catch(err){
-            res.status(500).json({error: "Erro ao criar usuário: ", err})
+            console.log(err);
+            res.status(500).json({message: "Erro ao criar usuário: ", err})
         }
     }
 }
