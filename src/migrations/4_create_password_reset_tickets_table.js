@@ -1,7 +1,7 @@
 exports.up = function(knex) {
     return knex.schema.createTable('password_reset_tickets', function(table){
-      table.integer('idUser').unsigned().notNullable();
-      table.string('token').notNullable();
+      table.integer('idUser').unsigned();
+      table.string('ticket').notNullable();
   
   
       table.foreign('idUser').references('id').inTable('user');

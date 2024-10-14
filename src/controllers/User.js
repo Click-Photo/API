@@ -7,6 +7,7 @@ module.exports = {
             const users = await UserService.getAllUsers();
             res.status(200).json(users);
         } catch(err){
+            console.error('erro: ',err);
             res.status(500).json({error: "Erro ao puxar usuários: ", err})
         }
     },

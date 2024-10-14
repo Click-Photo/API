@@ -1,7 +1,7 @@
 const UserRepository = require('../repositories/userRepository')
 
 module.exports = {
-    async getAllUser(){
+    async getAllUsers(){
         return await UserRepository.getAllUsers()
     },
 
@@ -9,27 +9,27 @@ module.exports = {
         return await UserRepository.createUser(user)
     },
 
-    async updateUser(){
-        return await UserRepository.updateUser()
+    async updateUser(user,idUser){
+        return await UserRepository.updateUser(user,idUser)
     },
 
-    async deleteUser(){
-        return await UserRepository.deleteUser()
+    async deleteUser(id){
+        return await UserRepository.deleteUser(id)
     },
 
-    async reqPasswordReset(){
-        return await UserRepository.reqPasswordReset()
+    async reqPasswordReset(userEmail){
+        return await UserRepository.reqPasswordReset(userEmail)
     },
 
-    async verifyPasswordResetTicket(){
-        return await UserRepository.verifyPasswordResetTicket()
+    async verifyPasswordResetTicket(userTicket){
+        return await UserRepository.verifyPasswordResetTicket(userTicket)
     },
 
-    async resetPassword(){
-        return await UserRepository.resetPassword()
+    async resetPassword(userEmail, user){
+        return await UserRepository.resetPassword(userEmail, user)
     },
 
-    async authLogin(){
-        return await UserRepository.authLogin()
+    async authLogin(user){
+        return await UserRepository.authLogin(user)
     }
 }

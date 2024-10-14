@@ -12,7 +12,6 @@ app.use(express.json());
 app.use((req, res, next) => {
   const allowedOrigins = [
     'http://localhost:3000',
-    'exp://192.168.15.5:8081'
   ];
 
   const origin = req.headers.origin;

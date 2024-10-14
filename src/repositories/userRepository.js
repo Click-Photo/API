@@ -30,13 +30,13 @@ module.exports = {
     CLIENTE = 3
     */
 
-    async getAllUsers(req,res){
+    async getAllUsers(user){
         try{
-            const users = await db('user').select('*');
-            res.status(200).json(users);
+            const user = await db('user').select('*');
+            return {message: user};
         } catch (err){
             console.error('Usuários não encontrados', err);
-            res.status(500).json({message: 'Usuários não encontrados.'})
+            return {message: 'Usuários não encontrados.'}
         }
     },
 
@@ -44,7 +44,7 @@ module.exports = {
         const{nome,telefone,email,CPF,CEP,senha,role} = user;
         
         try{
-            const hashedPassword = await bcrypt.hash(senha, 10);
+            const hashedPassword = await bcrypt.hash(senha, saltRounds, saltRounds);
             const dataAtual = moment().format('YYYY-MM-DD');
             
             const [id] = await db('user').insert({
@@ -78,9 +78,9 @@ module.exports = {
         }
     },
 
-    async updateUser (req,res){
-        const {id} = req.params;
-        const {nome, telefone, email, CEP} = req.body;
+    async updateUser (user, idUser){
+        const {id} = idUser;
+        const {nome, telefone, email, CEP} = user;
 
         try{
             await db('users').where({id}).update({
@@ -89,10 +89,10 @@ module.exports = {
                 email,
                 CEP
             });
-            res.status(200).json({message: 'Usuário atualizado'})
+            return{id,message: 'Usuário atualizado'};
         }catch(err){
             console.error('Erro ao atualizar usuário', err)
-            res.status(500).json({message: 'Não foi possível atualizar o usuário.'});
+            throw new Error('Não foi possível atualizar o usuário.');
         }
     },
     
@@ -103,16 +103,16 @@ module.exports = {
             await db('jobs').where({idUser: id}).del();
             await db('user').where({id}).del();
             
-            res.status(200).json({message: 'Usuário excluído com sucesso!'})
+            return{message: 'Usuário excluído com sucesso!'}
 
         }catch(err){
             console.error('Houve um erro ao excluir o usuário: ', err)
-            res.status(500).json({message: 'Não foi possível excluir o usuário.'});
+            throw new Error('Não foi possível excluir o usuário.');
         }
     },
 
-    async reqPasswordReset (req, res) {
-        const {email} = req.body;
+    async reqPasswordReset (userEmail) {
+        const {email} = userEmail;
         try {
             const resultUser = await db('user')
             if (resultUser.length > 0) {
@@ -139,60 +139,60 @@ module.exports = {
                         </div>`,
                 });
 
-                return res.status(200).json({message: 'Código de redefinição de senha enviado'});
+                return {message: 'Código de redefinição de senha enviado'};
             }
 
             console.log("Email não cadastrado")
-            return res.status(400).json({message: 'Email não cadastrado'});
+            return {message: 'Email não cadastrado'};
 
         }catch(err){
             console.error('Erro ao verificar email existente', err);
-            res.status(500).json({message: 'Não foi possível verificar o email.'})
+            throw new Error('Não foi possível verificar o email.')
 
         }
 
     },
 
-    async verifyPasswordResetTicket(req,res){
-        const {ticket} = req.body;
+    async verifyPasswordResetTicket(userTicket){
+        const {ticket} = userTicket
 
         try{
             const result = await db('ticket').where({ ticket}).select('*');
 
             if (result.length < 1){
                 console.log("Ticket inválido! " + validToken);
-                res.status(404).json({message: 'Ticket inválido! Favor digitar novamente!', validToken: false});
+                return{message: 'Ticket inválido! Favor digitar novamente!', validToken: false};
             }
 
             await db('token').where({token}).del();
-            res.status(200).json({ message: 'Ticket validado!'})
+            return {message: 'Ticket validado!'}
         } catch(err){
             console.error("Erro na validação de ticket: ", err)
-            res.status(500).json({message: 'Não foi possível validar o ticket.'})
+            return {message: 'Não foi possível validar o ticket.'}
         }
     },
 
-    async resetPassword(req, res){
-        const {email} = req.params;
-        const {senha, confirmaSenha} = req.body;
+    async resetPassword(userEmail, user){
+        const {email} = userEmail;
+        const {senha, confirmaSenha} = user;
 
         try{
             if (senha != confirmaSenha){
-                return res.status(400).json({message: 'Senhas diferentes!'})
+                return {message: 'Senhas diferentes!'}
             }
 
             const hashedPass = await bcrypt.hash(senha, saltRounds);
             await db('user').where({email: email}).update({senha: hashedPass})
-            res.status(200).json({message: 'Senha alterada com sucesso!'})
+            return {message: 'Senha alterada com sucesso!'}
         } catch(err){
             console.error("Erro ao redefinir senha: ",err);
-            res.status(500).json({message: 'Erro ao redefinir a senha!'})
+            return {message: 'Erro ao redefinir a senha!'}
         }
 
     },
 
-    async authLogin(req,res){
-        const {email, senha} = req.body;
+    async authLogin(user){
+        const {email, senha} = user;
 
         try{
             const user = await db('user').where({email}).select('*');

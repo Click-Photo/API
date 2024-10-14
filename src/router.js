@@ -15,9 +15,15 @@ const avaliacoesController = require('./controllers/Avaliacoes');
 const portfolioController = require('./controllers/Portfolio');
 const interesseController = require('./controllers/Interesses');
 const userController = require('./controllers/User');
+const confirmaUserController = require('./controllers/ConfirmaUser');
+
+//Rotas do Controller Confirma User
+router.post('/cadastroConfirmaUser',confirmaUserController.createUser)
+router.post('/verificarTokenConfirmaUser',confirmaUserController.verifyTicketConfirmUser)
 
 //Rotas do Controller User
 router.post('/criarUser',userController.createUser);
+router.get('/visualizarUsuarios',userController.getAllUsers)
 
 //Rotas do Controller Proposta
 router.post('/criarProposta/:idJobs',propostaController.createProposta);
@@ -53,7 +59,6 @@ router.post('/validaTokenCliente',clienteController.verificarToken);
 
 //Rotas do Controller ConfirmaCliente:
 router.post('/cadastroConfirmaCliente',confirmaClienteController.createConfirmaCliente);
-router.post('/teste',confirmaClienteController.teste)
 router.post('/verificarTokenConfirmaCliente',confirmaClienteController.verificarTokenConfirmaCliente);
 
 //Rotas do Controller confirmaFotografo
