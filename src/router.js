@@ -22,8 +22,10 @@ router.post('/cadastroConfirmaUser',confirmaUserController.createUser)
 router.post('/verificarTokenConfirmaUser',confirmaUserController.verifyTicketConfirmUser)
 
 //Rotas do Controller User
-router.post('/criarUser',userController.createUser);
-router.get('/visualizarUsuarios',userController.getAllUsers)
+router.post('/criarUsuario',userController.createUser);
+router.get('/visualizarUsuarios',userController.getAllUsers);
+router.put('/editarUsuario/:id',userController.updateUser);
+router.delete('/deletarUsuario/:id',userController.deleteUser);
 
 //Rotas do Controller Proposta
 router.post('/criarProposta/:idJobs',propostaController.createProposta);

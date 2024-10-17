@@ -44,9 +44,19 @@ module.exports = {
         const{nome,telefone,email,CPF,CEP,senha,role} = user;
         
         try{
-            const hashedPassword = await bcrypt.hash(senha, saltRounds, saltRounds);
+            const resultEmail = await db('user').where('email',email).select('*');
+            const resultCpf = await db('user').where('CPF', CPF).select('*');
+
+            if (resultEmail.length || resultCpf.length > 0){
+                console.error('Usuario já cadastrado');
+                return {message: 'Não é possível cadastrar usuario, CPF ou Email já existentes.'};
+            }
+
+            const hashedPassword = await bcrypt.hash(senha, saltRounds);
             const dataAtual = moment().format('YYYY-MM-DD');
-            
+
+            console.log("Criando usuario")
+
             const [id] = await db('user').insert({
                 nome,
                 telefone,
@@ -58,23 +68,23 @@ module.exports = {
                 dataEntrada : dataAtual
             });
 
-            if(role === 1){
-                return { id, message: 'Administrador criado' };
-            }
-            
-            if (role === 2){
-                await db('fotografo').insert({ id_user: id });
-                return { id, message: 'Fotografo criado' };
+            if (role === "Fotografo"){
+                await db('fotografo').insert({ idUser: id });
+                return {id, message: 'Fotografo criado com sucesso!'}
             }
 
-            if(role === 3){
-                await db('cliente').insert({ id_user: id });
-                return { id, message: 'Cliente criado' };
+            if(role === "Cliente"){
+                await db('cliente').insert({ idUser: id });
+                return {id, message: 'Cliente criado com sucesso!'}
             }
+
+            return {id, message: 'Administrador criado com sucesso!'}
+            
+           
             
         } catch(err){
             console.error('Erro ao cadastrar usuário', err);
-            throw new Error('Não foi possível cadastrar o usuário.');
+            return {message: 'Não foi possível cadastrar o usuário.'};
         }
     },
 
@@ -83,7 +93,7 @@ module.exports = {
         const {nome, telefone, email, CEP} = user;
 
         try{
-            await db('users').where({id}).update({
+            await db('user').where({id}).update({
                 nome,
                 telefone,
                 email,
@@ -92,15 +102,15 @@ module.exports = {
             return{id,message: 'Usuário atualizado'};
         }catch(err){
             console.error('Erro ao atualizar usuário', err)
-            throw new Error('Não foi possível atualizar o usuário.');
+            return {message: 'Não foi possível atualizar o usuário.'};
         }
     },
     
-    async deleteUser(req,res){
-        const {id} = req.params;
+    async deleteUser(idUser){
+        const {id} = idUser;
 
         try{
-            await db('jobs').where({idUser: id}).del();
+            //await db('jobs').where({idUser: id}).del();
             await db('user').where({id}).del();
             
             return{message: 'Usuário excluído com sucesso!'}

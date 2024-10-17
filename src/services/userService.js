@@ -13,8 +13,8 @@ module.exports = {
         return await UserRepository.updateUser(user,idUser)
     },
 
-    async deleteUser(id){
-        return await UserRepository.deleteUser(id)
+    async deleteUser(idUser){
+        return await UserRepository.deleteUser(idUser)
     },
 
     async reqPasswordReset(userEmail){

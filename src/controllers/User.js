@@ -21,5 +21,28 @@ module.exports = {
             console.log(err);
             res.status(500).json({message: "Erro ao criar usuário: ", err})
         }
+    },
+
+    async updateUser(req, res){
+        try{
+            const user = req.body;
+            const id = req.params;
+            const updatedUser = await UserService.updateUser(user,id);
+            res.status(200).json(updatedUser);
+        } catch(err){
+            console.log(err);
+            res.status(500).json({message: "Erro ao atualizar usuário: ", err})
+        }
+    },
+
+    async deleteUser(req,res){
+        try{
+            const id = req.params;
+            await UserService.deleteUser(id);
+            res.status(200).json({message: "Usuário deletado com sucesso!"})
+        } catch (err){
+            console.log(err);
+            res.status(500).json({message: "Erro ao deletar usuário: ", err})
+        }
     }
 }
