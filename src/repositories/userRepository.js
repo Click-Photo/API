@@ -128,26 +128,34 @@ module.exports = {
             if (resultUser.length > 0) {
                 const user = await db('user').select('id').where({email}).first();
                 const idUser = user.id;
-                const ticket = crypto.randomBytes(4).toString('hex');
+
+                let ticket;
+                let validTicket ;
+
+                do{
+                    ticket = crypto.randomBytes(4).toString('hex');
+                    validTicket = await db('password_reset_tickets').select('ticket').where({ ticket }).first();;
+                }while (validTicket)
+                
                 await db('password_reset_tickets').insert({
                     idUser,
                     ticket
                 });
 
-                await transporter.sendMail({
-                    from: '',
-                    to: email,
-                    subject: 'Redefinição de Senha',
-                    html: `
-                        <div style="background-color: black; padding: 8px 20px; text-align: center;">
-                            <h2 style="font-size: 24px; color: #fff; font-family: 'Baloo', sans-serif; font-weight: 700;">Click</h2>
-                        </div>
-                        <div style="padding: 20px; background-color: white;">
-                            <p style="font-size: 16px; color: black;">Olá!</p>
-                            <p style="font-size: 16px; color: black;">Esse é seu <strong style="color: black;">Código</strong> para redefinir a sua senha: ${token}!</p>
-                            <p style="font-size: 16px; color: black;"><strong style="color: black;">Click</strong> está à disposição. :)</p>
-                        </div>`,
-                });
+                // await transporter.sendMail({
+                //     from: '',
+                //     to: email,
+                //     subject: 'Redefinição de Senha',
+                //     html: `
+                //         <div style="background-color: black; padding: 8px 20px; text-align: center;">
+                //             <h2 style="font-size: 24px; color: #fff; font-family: 'Baloo', sans-serif; font-weight: 700;">Click</h2>
+                //         </div>
+                //         <div style="padding: 20px; background-color: white;">
+                //             <p style="font-size: 16px; color: black;">Olá!</p>
+                //             <p style="font-size: 16px; color: black;">Esse é seu <strong style="color: black;">Código</strong> para redefinir a sua senha: ${token}!</p>
+                //             <p style="font-size: 16px; color: black;"><strong style="color: black;">Click</strong> está à disposição. :)</p>
+                //         </div>`,
+                // });
 
                 return {message: 'Código de redefinição de senha enviado'};
             }
@@ -167,14 +175,14 @@ module.exports = {
         const {ticket} = userTicket
 
         try{
-            const result = await db('ticket').where({ ticket}).select('*');
+            const result = await db('password_reset_tickets').where({ ticket}).select('*');
 
             if (result.length < 1){
-                console.log("Ticket inválido! " + validToken);
-                return{message: 'Ticket inválido! Favor digitar novamente!', validToken: false};
+                console.log("Ticket inválido! " + result);
+                return{message: 'Ticket inválido! Favor digitar novamente!'};
             }
 
-            await db('token').where({token}).del();
+            await db('password_reset_tickets').where({ticket}).del();
             return {message: 'Ticket validado!'}
         } catch(err){
             console.error("Erro na validação de ticket: ", err)
@@ -182,9 +190,8 @@ module.exports = {
         }
     },
 
-    async resetPassword(userEmail, user){
-        const {email} = userEmail;
-        const {senha, confirmaSenha} = user;
+    async resetPassword(user){
+        const {email, senha, confirmaSenha} = user;
 
         try{
             if (senha != confirmaSenha){
@@ -201,31 +208,32 @@ module.exports = {
 
     },
 
-    async authLogin(user){
-        const {email, senha} = user;
+    async authLogin(authUser){
+        const {email, senha} = authUser;
 
         try{
             const user = await db('user').where({email}).select('*');
 
             if (user.length === 0){
-                return res.status(401).json({message: 'Email inválido!'});
+                return {message: 'Email inválido!'};
             }
 
-            const encryptedPassword = user.senha;
+            const encryptedPassword = user[0].senha;
 
             const comparePassword = await bcrypt.compare(senha, encryptedPassword)
 
             if (!comparePassword){
-                return res.status(401).json({auth: false, message: "Login inválido"})
+                return {auth: false, message: "Login inválido"}
             }
 
-            const token = jwt.sign({id: user.id}, 'your_secret_key', { expiresIn: '1h' });
-            res.cookie('token',token, {httpOnly: true, secure: true, maxAge: 3600000}) //uma hora em milisegundos
+            // const token = jwt.sign({id: user[0].id}, 'your_secret_key', { expiresIn: '1h' });
+            // res.cookie('token',token, {httpOnly: true, secure: true, maxAge: 3600000}) //uma hora em milisegundos
 
-            return res.json({auth:true, message: 'Login realizado com sucesso!'})
+            return {auth:true, message: 'Login realizado com sucesso!'}
 
         } catch(err){
-
+            console.log(err);
+            return {auth: false, message: 'Falha ao realizar o login!'}
         }
     }
 }

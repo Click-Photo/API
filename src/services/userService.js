@@ -25,11 +25,11 @@ module.exports = {
         return await UserRepository.verifyPasswordResetTicket(userTicket)
     },
 
-    async resetPassword(userEmail, user){
-        return await UserRepository.resetPassword(userEmail, user)
+    async resetPassword(user){
+        return await UserRepository.resetPassword(user)
     },
 
-    async authLogin(user){
-        return await UserRepository.authLogin(user)
+    async authLogin(authUser){
+        return await UserRepository.authLogin(authUser)
     }
 }

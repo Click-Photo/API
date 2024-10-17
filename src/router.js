@@ -26,6 +26,10 @@ router.post('/criarUsuario',userController.createUser);
 router.get('/visualizarUsuarios',userController.getAllUsers);
 router.put('/editarUsuario/:id',userController.updateUser);
 router.delete('/deletarUsuario/:id',userController.deleteUser);
+router.post('/esqueciMinhaSenha',userController.reqResetPass);
+router.post('/verificarTicket',userController.verifyPasswordResetTicket);
+router.post('/trocarSenha', userController.resetPassword);
+router.post('/loginUsuario', userController.authUser);
 
 //Rotas do Controller Proposta
 router.post('/criarProposta/:idJobs',propostaController.createProposta);

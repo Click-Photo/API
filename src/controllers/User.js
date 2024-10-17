@@ -44,5 +44,50 @@ module.exports = {
             console.log(err);
             res.status(500).json({message: "Erro ao deletar usuário: ", err})
         }
+    },
+
+    async reqResetPass(req,res){
+        try{
+            const email = req.body;
+            await UserService.reqPasswordReset(email);
+            res.status(200).json({message: "Link de redefinição enviado para seu email!"})
+        } catch(err){
+            console.log(err)
+            res.status(500).json({message: "Erro ao solicitar reset de senha"})
+        }
+    },
+
+    async verifyPasswordResetTicket(req, res){
+        try{
+            const ticket = req.body;
+            await  UserService.verifyPasswordResetTicket(ticket)
+            res.status(200).json({message: "Ticket válido!"})
+
+        } catch(err){
+            console.log(err);
+            res.status(500).json({message: "Tickec inválido!"})
+        }
+    },
+
+    async resetPassword(req,res){
+        try{
+            const user = req.body;
+            await UserService.resetPassword(user);
+            res.status(200).json({message: "Senha resetada com sucesso!"})
+        } catch(err){
+            console.log(err);
+            res.status(500).json({message: "Erro ao alterar senha."})
+        }
+    },
+
+    async authUser(req,res){
+        try{
+            const user = req.body;
+            const login = await UserService.authLogin(user)
+            res.status(200).json({message: login})
+        } catch(err){
+            console.log(err);
+            res.status(401).json({message: "Email ou senha inválidos!"})
+        }
     }
 }
