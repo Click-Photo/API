@@ -28,7 +28,7 @@ router.put('/editarUsuario/:id',userController.updateUser);
 router.delete('/deletarUsuario/:id',userController.deleteUser);
 router.post('/esqueciMinhaSenha',userController.reqResetPass);
 router.post('/verificarTicket',userController.verifyPasswordResetTicket);
-router.post('/trocarSenha', userController.resetPassword);
+router.put('/trocarSenha', userController.resetPassword);
 router.post('/loginUsuario', userController.authUser);
 
 //Rotas do Controller Proposta
