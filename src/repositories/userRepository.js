@@ -9,16 +9,16 @@ const moment = require('moment');
 const transporter =  nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: 'think.studio.tattoo@gmail.com',
-        pass: 'jsbgujwyvxfapzvq'
+        user: 'click.studio.ilustration@gmail.com',
+        pass: 'uoueupvqdobqlubg',
     },
 });
 
 const contato = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-      user: 'contato.think.studio@gmail.com',
-      pass: 'dwkljpgcgbdllljt',
+      user: 'click.studio.ilustration@gmail.com',
+      pass: 'uoueupvqdobqlubg',
     },
   });
 
@@ -142,20 +142,20 @@ module.exports = {
                     ticket
                 });
 
-                // await transporter.sendMail({
-                //     from: '',
-                //     to: email,
-                //     subject: 'Redefinição de Senha',
-                //     html: `
-                //         <div style="background-color: black; padding: 8px 20px; text-align: center;">
-                //             <h2 style="font-size: 24px; color: #fff; font-family: 'Baloo', sans-serif; font-weight: 700;">Click</h2>
-                //         </div>
-                //         <div style="padding: 20px; background-color: white;">
-                //             <p style="font-size: 16px; color: black;">Olá!</p>
-                //             <p style="font-size: 16px; color: black;">Esse é seu <strong style="color: black;">Código</strong> para redefinir a sua senha: ${token}!</p>
-                //             <p style="font-size: 16px; color: black;"><strong style="color: black;">Click</strong> está à disposição. :)</p>
-                //         </div>`,
-                // });
+                 await transporter.sendMail({
+                    from: '',
+                    to: email,
+                    subject: 'Redefinição de Senha',
+                    html: `
+                        <div style="background-color: black; padding: 8px 20px; text-align: center;">
+                                <h2 style="font-size: 24px; color: #fff; font-family: 'Baloo', sans-serif; font-weight: 700;">Click</h2>
+                            </div>
+                            <div style="padding: 20px; background-color: white;">
+                                <p style="font-size: 16px; color: black;">Olá!</p>
+                                <p style="font-size: 16px; color: black;">Esse é seu <strong style="color: black;">Código</strong> para redefinir a sua senha: ${token}!</p>
+                                <p style="font-size: 16px; color: black;"><strong style="color: black;">Click</strong> está à disposição. :)</p>
+                        </div>`,
+                 });
 
                 return {message: 'Código de redefinição de senha enviado'};
             }
@@ -232,7 +232,7 @@ module.exports = {
                 secure: process.env.NODE_ENV === 'production',
                 maxAge: 3600000 
             });
-            
+
             return {auth:true, message: 'Login realizado com sucesso!'}
 
         } catch(err){

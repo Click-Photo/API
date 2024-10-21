@@ -8,8 +8,8 @@ const saltRounds = 10;
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth:{
-        user: 'think.studio.tattoo@gmail.com ',
-        pass: ' jsbgujwyvxfapzvq'
+        user: 'click.studio.ilustration@gmail.com',
+        pass: 'uoueupvqdobqlubg',
     }
 })
 
@@ -23,18 +23,17 @@ module.exports = {
             CPF,
             CEP,
             senha,
+            role,
             dataEntrada
         } = req.body;
     
         try {
-            const resultsEmail = await db('cliente').where('email', email).select('*');
-            const resultsCpf = await db('cliente').where('CPF', CPF).select('*');
-            const resultsEmailFotografo = await db('fotografo').where('email', email).select('*');
-            const resultsEmailConfirmaCliente = await db('confirmacliente').where('email', email).select('*');
-            const resultsEmailConfirmaFotografo = await db('confirmafotografo').where('email', email).select('*');
-            const resultsCpfConfirmaCliente = await db('confirmacliente').where('CPF', CPF).select('*');
+            const resultsEmail = await db('user').where('email', email).select('*');
+            const resultsCpf = await db('user').where('CPF', CPF).select('*');
+            const resultsEmailConfirmaCliente = await db('confirmaUser').where('email', email).select('*');
+            const resultsCpfConfirmaCliente = await db('confirmaUser').where('CPF', CPF).select('*');
     
-            if (resultsEmail.length > 0 || resultsEmailConfirmaCliente.length > 0 || resultsEmailFotografo.length > 0 || resultsEmailConfirmaFotografo.length > 0) {
+            if (resultsEmail.length > 0 || resultsEmailConfirmaCliente.length > 0 ) {
                 console.error('Erro ao cadastrar cliente: Email já cadastrado.');
                 return res.status(400).json({ message: "Esse e-mail já está cadastrado, faça login!" });
             }
@@ -46,22 +45,22 @@ module.exports = {
     
             const hashedPass = await bcrypt.hash(senha, saltRounds);
             const dataEntrada = new Date();
-            const [id] = await db('confirmacliente').insert({
+            const [id] = await db('confirmaUser').insert({
                 nome,
                 telefone,
                 email,
                 CPF,
                 CEP,
                 senha: hashedPass,
+                role,
                 dataEntrada
             });
     
-            const token = crypto.randomBytes(3).toString('hex');
+            const ticket = crypto.randomBytes(3).toString('hex');
     
-            await db('token').insert({
-                idFotografo: 0,
-                idCliente: id,
-                token
+            await db('sign_in_ticket').insert({
+                idUser: id,
+                ticket
             });
     
             await transporter.sendMail({
@@ -74,7 +73,7 @@ module.exports = {
                     </div>
                     <div style="padding: 20px; background-color: white;">
                         <p style="font-size: 16px; color: black;">Olá!</p>
-                        <p style="font-size: 16px; color: black;">Esse é seu <strong style="color: black;">Código</strong> de acesso: ${token}!</p>
+                        <p style="font-size: 16px; color: black;">Esse é seu <strong style="color: black;">Código</strong> de acesso: ${ticket}!</p>
                         <p style="font-size: 16px; color: black;">O <strong style="color: black;">Click</strong> agradece o seu cadastro :)</p>
                     </div>
                 `,
