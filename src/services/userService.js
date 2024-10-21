@@ -29,7 +29,7 @@ module.exports = {
         return await UserRepository.resetPassword(user)
     },
 
-    async authLogin(authUser){
-        return await UserRepository.authLogin(authUser)
+    async authLogin(authUser, res){
+        return await UserRepository.authLogin(authUser, res)
     }
 }

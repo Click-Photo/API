@@ -83,7 +83,7 @@ module.exports = {
     async authUser(req,res){
         try{
             const user = req.body;
-            const login = await UserService.authLogin(user)
+            const login = await UserService.authLogin(user, res);
             res.status(200).json({message: login})
         } catch(err){
             console.log(err);

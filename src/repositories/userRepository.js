@@ -208,7 +208,7 @@ module.exports = {
 
     },
 
-    async authLogin(authUser){
+    async authLogin(authUser, res){
         const {email, senha} = authUser;
 
         try{
@@ -226,9 +226,13 @@ module.exports = {
                 return {auth: false, message: "Login inválido"}
             }
 
-            // const token = jwt.sign({id: user[0].id}, 'your_secret_key', { expiresIn: '1h' });
-            // res.cookie('token',token, {httpOnly: true, secure: true, maxAge: 3600000}) //uma hora em milisegundos
-
+            const token = jwt.sign({id: user[0].id}, 'your_secret_key', { expiresIn: '1h' });
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 3600000 
+            });
+            
             return {auth:true, message: 'Login realizado com sucesso!'}
 
         } catch(err){

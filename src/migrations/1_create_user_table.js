@@ -8,7 +8,7 @@ exports.up = function(knex) {
         table.string('CEP').notNullable();
         table.string('senha').notNullable();
         table.string('role').notNullable();
-        table.double('nota').notNullable();
+        table.double('nota').nullable();
         table.timestamp('dataEntrada').notNullable();
     })
 };
