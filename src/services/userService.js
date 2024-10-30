@@ -1,5 +1,9 @@
 const UserRepository = require('../repositories/userRepository')
 const crypto = require('crypto');
+const nodemailer = require("nodemailer");
+const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
+const moment = require('moment');
 
 const saltRounds = 10;
 
@@ -16,31 +20,31 @@ module.exports = {
         return await UserRepository.getAllUsers()
     },
 
-    async createUser(user){
-            const resultEmail =  await UserRepository.resultEmail(user)
-            const resultCpf = await UserRepository.resultCpf(user)
-
-            if(resultEmail.length > 0 || resultCpf.length > 0){
-                return {message: 'Email ou CPF já cadastrados'}
-            }
-            
-            const hashPass = await bcrypt.hash(user.senha, saltRounds)
-            const dataAtual = moment().format('YYYY-MM-DD');
-
-            const id = await UserRepository.createUser(user, dataAtual, hashPass)
-
-            if (role === "Fotografo"){
-                return {id, message: 'Fotografo criado com sucesso!'}
-            } 
-
-            if(role === "Cliente"){
-                return {id, message: 'Cliente criado com sucesso!'}
-            }
-
-            return {id, message: 'Administrador criado com sucesso!'}
-
-
-    },
+    async createUser(user) {
+        const resultEmail = await UserRepository.resultEmail(user);
+        const resultCpf = await UserRepository.resultCpf(user);
+    
+        if (resultEmail.length > 0 || resultCpf.length > 0) {
+            return { message: 'Email ou CPF já cadastrados' };
+        }
+    
+        const hashPass = await bcrypt.hash(user.senha, saltRounds);
+        const dataAtual = moment().format('YYYY-MM-DD');
+    
+        // Certifique-se de passar os parâmetros na ordem correta
+        const id = await UserRepository.createUser(user, hashPass, dataAtual);
+    
+        if (user.role === "fotografo") {
+            return { id, message: 'Fotógrafo criado com sucesso!' };
+        } 
+    
+        if (user.role === "cliente") {
+            return { id, message: 'Cliente criado com sucesso!' };
+        }
+    
+        return { id, message: 'Administrador criado com sucesso!' };
+    }
+    ,
 
     async updateUser(user,idUser){
              await UserRepository.updateUser(user,idUser)

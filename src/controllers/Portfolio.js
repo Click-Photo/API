@@ -29,13 +29,13 @@ module.exports = {
     async listarFotosGeral(req, res) {
         try {
             const fotos = await db('portfolio')
-                .join('fotografo', 'portfolio.fotografoId', 'fotografo.id')
+                .join('user', 'portfolio.fotografoId', 'user.id')
                 .select(
                     'portfolio.id as portfolioId',
                     'portfolio.fotoUrl',
                     'portfolio.descricao',
-                    'fotografo.id as fotografoId',
-                    'fotografo.nome as fotografoNome'
+                    'user.id as fotografoId',
+                    'user.nome as fotografoNome'
                 );
     
             res.status(200).json(fotos);

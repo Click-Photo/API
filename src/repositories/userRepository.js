@@ -120,5 +120,10 @@ module.exports = {
         const {email, senha} = authUser;
         const user = await db('user').where({email}).select('*');
         return user;
+    },
+
+    async getEmailById(id) {
+        const result = await db('user').select('email').where({ id });
+        return result.length > 0 ? result[0].email : null; 
     }
 }

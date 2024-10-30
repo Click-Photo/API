@@ -9,6 +9,7 @@ exports.up = function(knex) {
         table.string('senha').notNullable();
         table.string('role').notNullable();
         table.double('nota').nullable();
+        table.string('stripeAccountId');
         table.timestamp('dataEntrada').notNullable();
     })
 };
