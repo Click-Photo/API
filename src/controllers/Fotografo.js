@@ -6,7 +6,7 @@ module.exports = {
             const fotografos = await fotografoService.getAllFotografos();
             res.status(200).json(fotografos);
         } catch (err) {
-            console.error('fotórafos não encontrados', err);
+            console.error('fotógrafos não encontrados', err);
             res.status(500).json({ message: "Fotógrafos não encontrados" });
         }
     },

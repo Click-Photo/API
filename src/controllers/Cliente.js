@@ -41,7 +41,7 @@ module.exports = {
         
         try {
             await clienteService.updateClientes(id, nome, telefone, senha, CEP);
-            res.status(200).json({ message: 'Dados do cliente atualizado com sucesso!' });
+            res.status(200).json({ message: 'Dados do cliente atualizados com sucesso!' });
         } catch (err) {
             console.error('Impossivel alterar dados do cliente', err);
             res.status(500).json({ message: 'Impossivel alterar dados do cliente, entre em contato com o administrador' });
