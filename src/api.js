@@ -1,28 +1,27 @@
-const express = require('express')
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const clickRoutes = require('./router');
 
 const app = express();
 
-const clickRoutes = require('./router');
-
-
+// Middleware para JSON
 app.use(express.json());
 
-app.use((req, res, next) => {
 
+// CORS (Cross-Origin Resource Sharing)
+app.use((req, res, next) => {
   const allowedOrigins = [
     'http://localhost:3000',
-    'exp://192.168.15.5:8081'
   ];
 
   const origin = req.headers.origin;
 
-  if(allowedOrigins.includes(origin)){
+  if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
 
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   
   next();
 });

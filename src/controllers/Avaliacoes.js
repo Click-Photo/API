@@ -1,151 +1,76 @@
-const db = require('../database/db');
+const avaliacaoService = require('../services/avaliacaoService');
 
 module.exports = {
-    async getAvaliacoesPendentesCliente(req, res){
-        const clienteId = req.params.clienteId;
+    async getAvaliacoesPendentesCliente(req, res) {
+        const { clienteId } = req.params.clienteId;
 
-        try{
-            const avaliacoes = await db('avaliacoes')
-            .select(
-                'avaliacoes.id',
-                'avaliacoes.jobId',
-                'avaliacoes.fotografoId',
-                'avaliacoes.notaFotografo',
-                'jobs.titulo as jobTitulo',
-                'jobs.dataJob',
-                'jobs.preco',
-                'fotografo.nome as nomeFotografo'
-            )
-            .join('jobs', 'jobs.id', '=', 'avaliacoes.jobId') 
-            .join('fotografo', 'fotografo.id', '=', 'avaliacoes.fotografoId')
-            .where({
-                'avaliacoes.clienteId': clienteId,
-                'avaliacoes.clienteAvaliado': false  
-            });
-
+        try {
+            const avaliacoes = await avaliacaoService.getAvaliacoesPendentesCliente(clienteId);
             res.status(200).json(avaliacoes);
-
-        }catch(err){
+        } catch (err) {
             console.log("Erro ao buscar avaliações pendentes do Cliente: ", err);
             res.status(500).json("Erro ao buscar avaliações pendentes do Cliente");
         }
     },
 
-    async getAvaliacoesPendentesFotografo(req, res){
-        const fotografoId = req.params.fotografoId;
+    async getAvaliacoesPendentesFotografo(req, res) {
+        const { fotografoId } = req.params.fotografoId;
 
-        try{
-            const avaliacoes = await db('avaliacoes')
-            .select(
-                'avaliacoes.id',
-                'avaliacoes.jobId',
-                'avaliacoes.fotografoId',
-                'avaliacoes.notaFotografo',
-                'jobs.titulo as jobTitulo',
-                'jobs.dataJob',
-                'jobs.preco',
-                'cliente.nome as nomeCliente'
-            )
-            .join('jobs', 'jobs.id', '=', 'avaliacoes.jobId') 
-            .join('cliente', 'cliente.id', '=', 'avaliacoes.clienteId')
-            .where({
-                'avaliacoes.fotografoId': fotografoId,
-                'avaliacoes.fotografoAvaliado': false  
-            });
-
+        try {
+            const avaliacoes = await avaliacaoService.getAvaliacoesPendentesFotografo(fotografoId);
             res.status(200).json(avaliacoes);
-
-        }catch(err){
+        } catch (err) {
             console.log("Erro ao buscar avaliações pendentes do Fotografo: ", err);
             res.status(500).json("Erro ao buscar avaliações pendentes do Fotografo");
-        } 
+        }
     },
 
-    //Função para o cliente avaliar o fotografo
-    async avaliarFotografo(req, res){
-        const jobId = req.params.jobId;
-        const { notaFotografo } = req.body;
+    async avaliarFotografo(req, res) {
+        const { jobId } = req.params.jobId;
+        const { notaFotografo } = req.body.notaFotografo; 
 
-        try{
-            await db('avaliacoes').update({
-                notaFotografo,
-                clienteAvaliado: true, //ClienteAvaliado é o campo que determina se o cliente já fez a avaliação
-            })
-            .where('jobId', jobId);
-
+        try {
+            await avaliacaoService.avaliarFotografo(jobId, notaFotografo);
             res.status(200).json("Avaliação ao fotografo feita com sucesso");
-
-        }catch(err){
+        } catch (err) {
             console.log("Erro ao avaliar o fotografo: ", err);
             res.status(500).json("Erro ao avaliar o fotografo");
-        } 
+        }
     },
 
-    //Função para o fotografo avaliar o cliente
-    async avaliarCliente(req, res){
-        const jobId = req.params.jobId;
-        const { notaCliente } = req.body;
+    async avaliarCliente(req, res) {
+        const { jobId } = req.params.jobId
+        const { notaCliente } = req.body.notaCliente;
 
-        try{
-            await db('avaliacoes').update({
-                notaCliente,
-                fotografoAvaliado: true, //fotografoAvaliado é o campo que determina se o fotografo já fez a avaliação
-            })
-            .where('jobId', jobId);
-
+        try {
+            await avaliacaoService.avaliarCliente(jobId, notaCliente);
             res.status(200).json("Avaliação ao cliente feita com sucesso");
-
-        }catch(err){
+        } catch (err) {
             console.log("Erro ao avaliar o cliente: ", err);
             res.status(500).json("Erro ao avaliar o cliente");
-        } 
+        }
     },
 
-    async mediaAvaliacoesFotografo (req, res){
+    async mediaAvaliacoesFotografo(req, res) {
         const fotografoId = req.params.fotografoId;
 
-        try{
-
-            const result = await db("avaliacoes")
-                .where({
-                    'fotografoId': fotografoId,
-                    'clienteAvaliado': true
-                })
-                .avg("notaFotografo as mediaNota")
-                .count("notaFotografo as totalAvaliacoes");
-            
-            const mediaNota = result[0].mediaNota ? parseFloat(result[0].mediaNota).toFixed(1) : 'Sem avaliações';
-            const totalAvaliacoes = result[0].totalAvaliacoes;
-
-            res.status(200).json({ mediaNota, totalAvaliacoes });
-
-        }catch(err){
+        try {
+            const media = await avaliacaoService.mediaAvaliacoesFotografo(fotografoId);
+            res.status(200).json(media);
+        } catch (err) {
             console.log("Erro ao buscar a média da nota do fotografo: ", err);
             res.status(500).json("Erro ao buscar a média da nota do fotografo");
         }
     },
 
-    async mediaAvaliacoesCliente (req, res){
+    async mediaAvaliacoesCliente(req, res) {
         const clienteId = req.params.clienteId;
-
-        try{
-            const result = await db("avaliacoes")
-                .where({
-                    'clienteId': clienteId,
-                    'fotografoAvaliado': true
-                })
-                .avg("notaCliente as mediaNota")
-                .count("notaCliente as totalAvaliacoes");
-            
-            const mediaNota = result[0].mediaNota ? parseFloat(result[0].mediaNota).toFixed(1) : 'Sem avaliações';
-            const totalAvaliacoes = result[0].totalAvaliacoes;
-
-            res.status(200).json({ mediaNota, totalAvaliacoes });
-
-        }catch(err){
+        try {
+            const media = await avaliacaoService.mediaAvaliacoesCliente(clienteId);
+            res.status(200).json(media);
+        } catch (err) {
             console.log("Erro ao buscar a média da nota do cliente: ", err);
             res.status(500).json("Erro ao buscar a média da nota do cliente");
         }
     }
-      
 };

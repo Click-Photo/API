@@ -11,8 +11,8 @@ exports.up = function(knex) {
         table.string('status');
         table.string("preco").notNullable();
 
-        table.foreign('idCliente').references('id').inTable('cliente');
-        table.foreign('idFotografo').references('id').inTable('fotografo');
+        table.foreign('idCliente').references('id').inTable('user');
+        table.foreign('idFotografo').references('id').inTable('user');
     })
 };
 

@@ -8,8 +8,8 @@ const saltRounds = 10;
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth:{
-        user: 'think.studio.tattoo@gmail.com',
-        pass: ' jsbgujwyvxfapzvq'
+        user: 'click.studio.ilustration@gmail.com',
+        pass: 'uoueupvqdobqlubg',
     }
 })
 
@@ -26,7 +26,7 @@ module.exports = {
         } = req.body;
 
         try{
-            const results = await db('confirmaFotografo')
+            const results = await db('confirmaUser')
             .where({email})
             .select('*');
 
@@ -37,7 +37,7 @@ module.exports = {
 
             const hashedPass = await bcrypt.hash(senha, saltRounds);
             const dataEntrada= new Date();
-            const [id] = await db ('confirmaFotografo').insert({
+            const [id] = await db ('confirmaUser').insert({
                 nome,
                 telefone,
                 email,
@@ -49,7 +49,7 @@ module.exports = {
 
             const token = cryto.randomBytes(3).toString('hex');
 
-            await db('token').insert({
+            await db('sign_in_ticket').insert({
                 idCliente: id,
                 token
             })
@@ -78,7 +78,7 @@ module.exports = {
     async verificarTokenConfirmaFotografo(req, res){
         const {token} = req.body;
         try{
-            const tokenData = await db('token').where({token}).first();
+            const tokenData = await db('sign_in_ticket').where({token}).first();
 
             if (!tokenData){
                 res.status(200).json({message: "Token Inválido"})
@@ -94,9 +94,9 @@ module.exports = {
                 CEP,
                 senha,
                 dataEntrada
-            } = await db ('confirmaFotografo').where({id: idFotografoToken}).first();
+            } = await db ('confirmaUser').where({id: idFotografoToken}).first();
 
-            const [id] =  await db ('fotografo').insert({
+            const [id] =  await db ('user').insert({
                 nome,
                 telefone,
                 email,
@@ -106,8 +106,8 @@ module.exports = {
                 dataEntrada
             })
 
-            await db('token').where({token}).del();
-            await db('confirmaFotografo').where({id: idFotografoToken}).del();
+            await db('sign_in_ticket').where({token}).del();
+            await db('confirmaUser').where({id: idFotografoToken}).del();
 
             res.status(200).json({message: 'Token Válido'});
         }catch(err){

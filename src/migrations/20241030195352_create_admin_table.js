@@ -1,17 +1,16 @@
 exports.up = function(knex) {
-    return knex.schema.createTable('fotografo', function (table){
+    return knex.schema.createTable('admin', function(table) {
         table.increments('id').primary();
-        table.string('email').notNullable();
         table.string('nome').notNullable();
         table.string('telefone').notNullable();
-        table.string('CPF').notNullable();
+        table.string('email').unique().notNullable();
+        table.string('CPF').unique().notNullable();
         table.string('CEP').notNullable();
         table.string('senha').notNullable();
-        table.string('nota');
-        table.timestamp('dataEntrada').notNullable();
-    })
+        table.timestamp('dataEntrada').defaultTo(knex.fn.now());
+    });
 };
 
 exports.down = function(knex) {
-  return knex.schema.dropTable('fotografo');
+    return knex.schema.dropTable('admin');
 };

@@ -4,8 +4,8 @@ const nodemailer = require('nodemailer');
 const transporter =  nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: 'think.studio.tattoo@gmail.com',
-        pass: 'jsbgujwyvxfapzvq'
+        user: 'click.studio.ilustration@gmail.com',
+        pass: 'uoueupvqdobqlubg',
     }
 });
 
@@ -71,7 +71,7 @@ module.exports = {
             // Seleciona todas as propostas feitas pelo cliente, juntando com as informações do job e do fotógrafo
             const propostas = await db('proposta')
                 .join('jobs', 'proposta.idJobs', 'jobs.id')
-                .join('fotografo', 'proposta.idFotografo', 'fotografo.id')
+                .join('user', 'proposta.idFotografo', 'user.id')
                 .select(
                     'proposta.id',
                     'proposta.idJobs',
@@ -80,7 +80,7 @@ module.exports = {
                     'proposta.status',
                     'jobs.dataJob',
                     'jobs.preco',
-                    'fotografo.nome as nomeFotografo'
+                    'user.nome as nomeFotografo'
                 )
                 .where({ 'proposta.idCliente': idCliente });
     
@@ -111,7 +111,7 @@ module.exports = {
             // Seleciona todas as propostas feitas pelo cliente, juntando com as informações do job e do fotógrafo
             const propostas = await db('proposta')
                 .join('jobs', 'proposta.idJobs', 'jobs.id')
-                .join('fotografo', 'proposta.idFotografo', 'fotografo.id')
+                .join('user', 'proposta.idFotografo', 'user.id')
                 .select(
                     'proposta.id',
                     'proposta.idJobs',
@@ -120,7 +120,7 @@ module.exports = {
                     'proposta.status',
                     'jobs.dataJob',
                     'jobs.preco',
-                    'fotografo.nome as nomeFotografo'
+                    'user.nome as nomeFotografo'
                 )
                 .where({ 'proposta.idJobs': idJob })
                 .andWhere(builder => {
@@ -193,7 +193,7 @@ module.exports = {
                 status: 'Aceito'
             })
 
-            const emailResult = await db('fotografo').select('email').where({ id: idFotografo });
+            const emailResult = await db('user').select('email').where({ id: idFotografo });
             const email = emailResult.length > 0 ? emailResult[0].email : null;
 
             if (!email) {
@@ -227,7 +227,7 @@ module.exports = {
         const { idFotografo, nomeCliente } = req.body;
         
         try{
-            const emailResult = await db('fotografo').select('email').where({ id: idFotografo });
+            const emailResult = await db('user').select('email').where({ id: idFotografo });
             const email = emailResult.length > 0 ? emailResult[0].email : null;
 
             await db('proposta').where({id}).update({

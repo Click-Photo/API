@@ -14,6 +14,46 @@ const propostaController = require ('./controllers/Proposta');
 const avaliacoesController = require('./controllers/Avaliacoes');
 const portfolioController = require('./controllers/Portfolio');
 const interesseController = require('./controllers/Interesses');
+const userController = require('./controllers/User');
+const confirmaUserController = require('./controllers/ConfirmaUser');
+const adminController = require('./controllers/Admin');
+
+// Rotas do Controller Admin
+router.get('/visualizarAdmins', adminController.getAllAdmins);
+router.post('/criarAdmin', adminController.createAdmin);
+router.post('/loginAdmin', adminController.loginAdmin);
+
+// Rotas de gestão de Clientes e Fotógrafos pelo Admin
+router.get('/visualizarFotografos', adminController.getAllFotografos);
+router.get('/visualizarClientes', adminController.getAllClientes);
+router.post('/adicionarCliente', adminController.addCliente);
+router.delete('/deletarCliente/:id', adminController.deleteCliente);
+router.post('/adicionarFotografo', adminController.addFotografo);
+router.delete('/deletarFotografo/:id', adminController.deleteFotografo);
+
+// Rotas de exclusão de Jobs e Portfólios pelo Admin
+router.delete('/deletarJob/:jobId', adminController.deleteJob);
+router.delete('/deletarImagemPortfolio/:imageId', adminController.deletePortfolioImage);
+
+// Rota para adicionar outro Administrador
+router.post('/adicionarAdmin', adminController.addAdmin);
+
+// Rota para obter contagem de usuários (Clientes e Fotógrafos)
+router.get('/contagemUsuarios', adminController.getUserCounts);
+
+//Rotas do Controller Confirma User
+router.post('/cadastroConfirmaUser',confirmaUserController.createUser)
+router.post('/verificarTokenConfirmaUser',confirmaUserController.verifyTicketConfirmUser)
+
+//Rotas do Controller User
+router.post('/criarUsuario',userController.createUser);
+router.get('/visualizarUsuarios',userController.getAllUsers);
+router.put('/editarUsuario/:id',userController.updateUser);
+router.delete('/deletarUsuario/:id',userController.deleteUser);
+router.post('/esqueciMinhaSenha',userController.reqResetPass);
+router.post('/verificarTicket',userController.verifyPasswordResetTicket);
+router.put('/trocarSenha', userController.resetPassword);
+router.post('/loginUsuario', userController.authUser);
 
 //Rotas do Controller Proposta
 router.post('/criarProposta/:idJobs',propostaController.createProposta);
@@ -35,17 +75,9 @@ router.post('/finalizarJob/:id',jobsController.finalizarJob);
 router.get('/getJobsFotografo/:id', jobsController.getJobsFotografo);
 
 //Rotas de Controller cliente:
-router.post('/cadastroCliente', clienteController.criarCliente); //Provisório para testes rápidos
 router.post('/alterarCliente/:id',clienteController.updateClientes);
-router.post('/deletarCliente/:id',clienteController.deleteClientes);
 router.post('/visualizarCliente',clienteController.getAllClientes);
 router.get('/getEspecifCliente/:id', clienteController.getEspecifCliente);
-
-//Metódos:
-router.post('/solicitarTrocaSenha',clienteController.requisitarResetSenha);
-router.post('/redefinirSenha/:email',clienteController.resetSenha);
-router.post('/autenticacaoCliente',clienteController.autenticacaoLogin);
-router.post('/validaTokenCliente',clienteController.verificarToken);
 
 //Rotas do Controller ConfirmaCliente:
 router.post('/cadastroConfirmaCliente',confirmaClienteController.createConfirmaCliente);
@@ -57,9 +89,8 @@ router.post('/verificarTokenConfirmaFotografo',confirmaFotografoController.verif
 
 
 //Rotas de Controller  fotografo:
-router.post('/cadastroFotografo',fotografoController.createFotografo);
+router.post('/createAccountLink',fotografoController.createAccountLink);
 router.post('/alterarFotografo/:id',fotografoController.updateFotografo);
-router.post('/deletarfotografo/:id',fotografoController.deleteFotografo);
 router.post('/visualizarFotografo',fotografoController.getAllFotografos);
 router.get('/getEspecifFotografo/:id', fotografoController.getEspecifFotografo);
 

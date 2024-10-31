@@ -1,9 +1,9 @@
-const db = require('../database/db');
+const interestService = require('../services/interesseService');
 
 module.exports = {
     async getAllInteresses(req, res) {
         try {
-            const interesses = await db('interesses').select('*');
+            const interesses = await interestService.getAllInteresses();
             res.status(200).json(interesses);
         } catch (err) {
             console.error('interesses não encontrados', err);
@@ -16,11 +16,7 @@ module.exports = {
         const { idFotografo } = req.body; 
 
         try {
-            const interesse = await db('interesses').insert({
-                idJobs: idJob,
-                idFotografo: idFotografo
-            });
-
+            await interestService.marcarInteresse(idJob, idFotografo);
             res.status(201).json({ message: 'Interesse marcado com sucesso!' });
         } catch (err) {
             console.error('Erro ao marcar interesse', err);
@@ -32,14 +28,7 @@ module.exports = {
         const { idFotografo } = req.params;
 
         try {
-            const interesses = await db('interesses')
-                .join('jobs', 'interesses.idJobs', '=', 'jobs.id')
-                .select(
-                    'interesses.id as interesseId',
-                    'jobs.*'
-                )
-                .where('interesses.idFotografo', idFotografo);
-
+            const interesses = await interestService.getInteressesFotografo(idFotografo);
             res.status(200).json(interesses);
         } catch (err) {
             console.error('Erro ao buscar interesses do fotógrafo', err);
