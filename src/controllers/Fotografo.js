@@ -6,8 +6,8 @@ module.exports = {
             const fotografos = await fotografoService.getAllFotografos();
             res.status(200).json(fotografos);
         } catch (err) {
-            console.error('fotógrafos não encontrados', err);
-            res.status(500).json({ message: "Fotógrafos não encontrados" });
+            console.error('clientes não encontrados', err);
+            res.status(500).json({ message: "Fotografos não encontrados" });
         }
     },
 
@@ -18,8 +18,8 @@ module.exports = {
             const fotografo = await fotografoService.getEspecifFotografo(id);
             res.status(200).json(fotografo);
         } catch (err) {
-            console.error('fotógrafos não encontrados', err);
-            res.status(500).json({ message: "fotógrafos não encontrados" });
+            console.error('fotografos não encontrados', err);
+            res.status(500).json({ message: "fotografos não encontrados" });
         }
     },
 
@@ -41,10 +41,10 @@ module.exports = {
 
         try {
             await fotografoService.updateFotografo(id, nome, telefone, senha, CEP);
-            res.status(200).json({ message: 'Dados do fotógrafo atualizado com sucesso!' });
+            res.status(200).json({ message: 'Dados do fotografo atualizado com sucesso!' });
         } catch (err) {
-            console.error('Impossivel alterar dados do fotógrafo', err);
-            res.status(500).json({ message: 'Impossivel alterar dados do fotógrafo, entre em contato com o administrador' });
+            console.error('Impossivel alterar dados do fotografo', err);
+            res.status(500).json({ message: 'Impossivel alterar dados do fotografo, entre em contato com o administrador' });
         }
     }
 };

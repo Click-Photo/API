@@ -45,6 +45,16 @@ router.get('/contagemUsuarios', adminController.getUserCounts);
 router.post('/cadastroConfirmaUser',confirmaUserController.createUser)
 router.post('/verificarTokenConfirmaUser',confirmaUserController.verifyTicketConfirmUser)
 
+//Rotas Pagamento
+router.post('/confirmarPagamento/:jobId', jobsController.confirmarPagamento);
+router.post('/create-checkout-session', jobsController.createCheckoutSessionController);
+
+// Rota para renderizar a página HTML de simulação do pagamento
+router.get('/simular-pagamento/:clientSecret/:jobId', (req, res) => {
+    const { clientSecret, jobId } = req.params;
+    res.render('pagamento', { clientSecret, jobId });
+});
+
 //Rotas do Controller User
 router.post('/criarUsuario',userController.createUser);
 router.get('/visualizarUsuarios',userController.getAllUsers);

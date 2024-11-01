@@ -4,6 +4,7 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
+const stripe = require('stripe')(process.env.STRIPE_KEY_TEST);
 
 const saltRounds = 10;
 
@@ -14,6 +15,36 @@ const transporter =  nodemailer.createTransport({
         pass: 'uoueupvqdobqlubg',
     },
 });
+
+async function criarContaFotografo() {
+    try {
+        const stripeAccount = await stripe.accounts.create({
+            type: 'express',
+            country: 'BR',
+            capabilities: {
+                card_payments: { requested: true },
+                transfers: { requested: true },
+            },
+        });
+        
+        return stripeAccount;
+    } catch (error) {
+        console.error('Erro ao criar conta conectada na Stripe:', error);
+        throw new Error('Falha ao criar conta do fotógrafo na Stripe');
+    }
+}
+
+// Função para criar um link de onboarding para o fotógrafo
+ async function criarLinkOnboardingConta(fotografoStripeAccountId) {
+    const accountLink = await stripe.accountLinks.create({
+        account: fotografoStripeAccountId,
+        refresh_url: 'http://localhost:3000/cadastro/fotografo',
+        return_url: 'http://localhost:3000/cadastro/sucesso',
+        type: 'account_onboarding',
+    });
+
+    return accountLink.url;
+}
 
 module.exports = {
     async getAllUsers(){
@@ -33,9 +64,12 @@ module.exports = {
     
         // Certifique-se de passar os parâmetros na ordem correta
         const id = await UserRepository.createUser(user, hashPass, dataAtual);
-    
         if (user.role === "fotografo") {
-            return { id, message: 'Fotógrafo criado com sucesso!' };
+            const stripeAccount = await criarContaFotografo();
+      
+            await UserRepository.updateStripeAccountId(id, stripeAccount.id);
+            const onboardingLink = await criarLinkOnboardingConta(stripeAccount.id);
+            return { id: id, message: 'Fotógrafo criado com sucesso!', onboardingLink };
         } 
     
         if (user.role === "cliente") {
@@ -43,8 +77,7 @@ module.exports = {
         }
     
         return { id, message: 'Administrador criado com sucesso!' };
-    }
-    ,
+    },
 
     async updateUser(user,idUser){
              await UserRepository.updateUser(user,idUser)

@@ -14,6 +14,7 @@ const transporter =  nodemailer.createTransport({
     },
 });
 
+
 module.exports = {
 
     /*
@@ -70,6 +71,26 @@ module.exports = {
                 email,
                 CEP
         }); //Faz update no banco
+    },
+
+    async updateStripeAccountId(userId, stripeAccountId) {
+        try {
+            if (!userId || !stripeAccountId) {
+                throw new Error('Parâmetros userId ou stripeAccountId estão indefinidos');
+            }
+            
+            console.log('Atualizando stripeAccountId para:', stripeAccountId, 'do usuário com id:', userId);
+            
+            // Atualiza o campo stripeAccountId do usuário com o id especificado
+            await db('user')
+                .where({ id: userId })
+                .update({ stripeAccountId });
+                
+            return { success: true, message: 'stripeAccountId atualizado com sucesso' };
+        } catch (error) {
+            console.error('Erro ao atualizar stripeAccountId:', error);
+            return { success: false, message: 'Erro ao atualizar stripeAccountId' };
+        }
     },
     
     async deleteUser(idUser){

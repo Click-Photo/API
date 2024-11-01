@@ -46,6 +46,13 @@ class JobRepository {
         return await db('jobs').where({ id }).first();
     }
 
+    async getEspecificJob(id) {
+        return await db('jobs')
+        .join('user', 'jobs.idFotografo', '=', 'user.id')
+        .where('jobs.id', id) 
+        .select('jobs.*', 'user.stripeAccountId');
+    }
+
     async createAvaliacoes(jobId, clienteId, fotografoId) {
         await db('avaliacoes').insert({
             jobId,
@@ -60,21 +67,29 @@ class JobRepository {
         return await db('user').where({ id }).first();
     }
 
-    async createPaymentIntent(amount, fotografoId) {
+    async createPaymentIntent(amount, jobId, fotografoId) {
         const fotografo = await this.getFotografo(fotografoId);
         if (!fotografo || !fotografo.stripeAccountId) {
             throw new Error('Fotógrafo não possui conta conectada ao Stripe.');
         }
-
+    
         return await stripe.paymentIntents.create({
             amount: Math.round(amount * 100), // Valor em centavos
             currency: 'brl',
             payment_method_types: ['card'],
             transfer_data: {
-                destination: fotografo.stripeAccountId,
-            }
+                destination: fotografo.stripeAccountId, // Conta conectada do fotógrafo
+            },
+            metadata: { jobId } // Inclui o ID do job como metadado para rastreamento
         });
     }
+    
+
+    async updateStatus(jobId, status) {
+        return await db('jobs').where({ id: jobId }).update({ status });
+    }
+    
+    
 }
 
 module.exports = new JobRepository();
