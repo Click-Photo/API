@@ -1,7 +1,6 @@
 const jobService = require('../services/jobService');
 require('dotenv').config();
 const stripe = require('stripe')(`${process.env.STRIPE_KEY_TEST}`);
-const { createCheckoutSession } = require('../services/checkoutService');
 
 module.exports = {
     async getAllJobs(req, res) {
@@ -121,21 +120,6 @@ module.exports = {
         } catch (err) {
             console.error('Erro ao finalizar job e processar pagamento', err);
             res.status(500).json({ message: 'Erro ao finalizar job e processar pagamento.' });
-        }
-    },
-
-    async createCheckoutSessionController(req, res) {
-        const { amount, jobId, photographerStripeAccountId } = req.body; // Recebe os detalhes do job e o valor do pagamento
-    
-        try {
-            // Chama a função do serviço para criar a sessão de checkout
-            const session = await createCheckoutSession(amount, jobId, photographerStripeAccountId);
-    
-            // Envia o URL de checkout para o frontend redirecionar o cliente
-            res.json({ url: session.url });
-        } catch (error) {
-            console.error('Erro ao criar a sessão de checkout:', error);
-            res.status(500).json({ error: 'Falha ao criar a sessão de checkout' });
         }
     },
 

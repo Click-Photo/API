@@ -47,7 +47,6 @@ router.post('/verificarTokenConfirmaUser',confirmaUserController.verifyTicketCon
 
 //Rotas Pagamento
 router.post('/confirmarPagamento/:jobId', jobsController.confirmarPagamento);
-router.post('/create-checkout-session', jobsController.createCheckoutSessionController);
 
 // Rota para renderizar a página HTML de simulação do pagamento
 router.get('/simular-pagamento/:clientSecret/:jobId', (req, res) => {
