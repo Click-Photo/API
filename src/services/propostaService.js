@@ -1,6 +1,6 @@
 const propostaRepository = require('../repositories/propostaRepository');
 const jobRepository = require('../repositories/jobRepository');
-const userRepository = require('../repositories/userRepository'); // Importa o repositório de usuários
+const userRepository = require('../repositories/userRepository'); 
 
 class PropostaService {
     async getAllPropostas() {

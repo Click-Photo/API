@@ -16,7 +16,7 @@ module.exports = {
         try{
             const user = req.body;
             const createUser = await  UserService.createUser(user);
-            res.status(201).json(createUser);
+            res.status(200).json(createUser);
         } catch(err){
             console.log(err);
             res.status(500).json({message: "Erro ao criar usuário: ", err})

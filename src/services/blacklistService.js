@@ -5,16 +5,18 @@ module.exports = {
     return await blacklistRepository.getAllBlacklisted();
   },
 
-  async createBlacklistedUser(user){
-    const {idUser,motivo} = user
-    const result = blacklistRepository.getEspecifUser(idUser)
+  async createBlacklistedUser(user) {
+    const { idUser, motivo } = user;
+    const result = await blacklistRepository.getEspecifUser(idUser); // Adicionado await
 
-    if (result.length>0){
-      return {message: "Usuário já bloqueado!"}
+    if (result.length > 0) {
+      return { message: "Usuário já bloqueado!" };
     }
 
-    const id = await blacklistRepository.createBlacklistedUser(user)
+    const id = await blacklistRepository.createBlacklistedUser(user);
+    return { message: "Usuario bloqueado!" };
   },
+
 
   async deleteBlacklistedUser(id){
     return await blacklistRepository.deleteBlacklistedUser(id)

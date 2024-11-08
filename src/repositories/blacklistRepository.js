@@ -6,9 +6,9 @@ module.exports = {
   },
 
   async createBlacklistedUser(user){
-    const {idUser, motivo} = user
+  const {idUser, motivo} = user;
     const[id] = await db('blacklist').insert({
-      IdUser,
+      IdUser : idUser,
       motivo
     })
 
@@ -16,11 +16,13 @@ module.exports = {
   },
 
   async deleteBlacklistedUser(id){
-    return db('blacklist').where(id).del();
+    return db('blacklist').where({idUser: id}).del();
   },
 
-  async getEspecifUser(id){
-    return db('blacklist').where({idUser: id})
+  async getEspecifUser(idUser) {
+    return db('blacklist').where({ idUser });
   }
+  
+  
 
 }

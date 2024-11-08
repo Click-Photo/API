@@ -124,6 +124,11 @@ module.exports = {
 
     async getEmailById(id) {
         const result = await db('user').select('email').where({ id });
-        return result.length > 0 ? result[0].email : null; 
+        return result;
+    },
+
+    async getRoleById(id){
+        const result = await db('user').select('role').where({ id });
+        return result;
     }
 }

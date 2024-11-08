@@ -17,6 +17,12 @@ const interesseController = require('./controllers/Interesses');
 const userController = require('./controllers/User');
 const confirmaUserController = require('./controllers/ConfirmaUser');
 const adminController = require('./controllers/Admin');
+const blackListController = require('./controllers/BlackList');
+
+// Rotas do Controller BlackList
+router.get('/visualizarBloqueados', blackListController.getAllBlackListed)
+router.post('/bloquearUsuario', blackListController.createBlacklistedUser)
+router.delete('/desbloquearUsuario/:id',blackListController.deleteBlacklistedUser)
 
 // Rotas do Controller Admin
 router.get('/visualizarAdmins', adminController.getAllAdmins);
