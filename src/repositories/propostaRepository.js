@@ -6,9 +6,8 @@ class PropostaRepository {
         return await db('proposta').select('*');
     }
 
-    async createProposta(idJobs, idCliente, idFotografo) {
+    async createProposta(idJobs, idFotografo) {
         return await db('proposta').insert({
-            idCliente,
             idFotografo,
             idJobs
         });

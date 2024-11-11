@@ -1,5 +1,4 @@
 const propostaService = require('../services/propostaService');
-const PropostaService = require('../services/propostaService')
 
 
 module.exports = {

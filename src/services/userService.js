@@ -1,4 +1,5 @@
 const UserRepository = require('../repositories/userRepository')
+const blacklistRepository = require ('../repositories/blacklistRepository')
 const crypto = require('crypto');
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -118,6 +119,11 @@ module.exports = {
         const validUser = await UserRepository.resultEmail(user);
         if(validUser.length === 0){
             return {message: 'Email ou senha inválido!'};
+        }
+
+        const validBlacklisted = await blacklistRepository.getEspecifIdByEmail(email)
+        if (validBlacklisted.length > 0){
+            return {message: 'Usuário Bloqueado!'}
         }
 
         const encryptedPassword = validUser[0].senha;

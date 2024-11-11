@@ -1,4 +1,5 @@
 const jobRepository = require('../repositories/jobRepository');
+const userRepository = require('../repositories/userRepository');
 
 class JobService {
     async getAllJobs() {
@@ -14,6 +15,13 @@ class JobService {
     }
 
     async createJob(jobData) {
+        const [idCliente] = jobData
+        const role = await userRepository.get(idCliente);
+        
+        if (role != "Cliente"){
+            return {message: "Impossível criar job"}
+        }
+
         return await jobRepository.createJob(jobData);
     }
 

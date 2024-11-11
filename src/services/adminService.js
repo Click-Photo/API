@@ -7,7 +7,7 @@ module.exports = {
         return await adminRepository.getAllAdmins();
     },
 
-    async createAdmin(nome, telefone, email, CPF, CEP, senha) {
+    async createAdmin(nome, telefone, email, senha) {
         const existingAdmin = await adminRepository.findAdminByEmail(email);
         if (existingAdmin) {
             throw new Error('E-mail já cadastrado');
@@ -18,8 +18,6 @@ module.exports = {
             nome,
             telefone,
             email,
-            CPF,
-            CEP,
             senha: hashedPassword,
         };
 

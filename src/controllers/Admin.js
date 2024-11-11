@@ -12,10 +12,10 @@ module.exports = {
     },
 
     async createAdmin(req, res) {
-        const { nome, telefone, email, CPF, CEP, senha } = req.body;
+        const { nome, telefone, email, senha } = req.body;
 
         try {
-            await adminService.createAdmin(nome, telefone, email, CPF, CEP, senha);
+            await adminService.createAdmin(nome, telefone, email, senha);
             res.status(201).json({ message: 'Administrador criado com sucesso' });
         } catch (err) {
             console.error('Erro ao criar administrador', err);

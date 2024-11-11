@@ -21,6 +21,12 @@ module.exports = {
 
   async getEspecifUser(idUser) {
     return db('blacklist').where({ idUser });
+  },
+
+  async getEspecifIdByEmail(email){
+    const user = await db('user').select('id').where({email}).first();
+    const result = await db('blacklist').select('id').where({id: user});
+    return result;
   }
   
   

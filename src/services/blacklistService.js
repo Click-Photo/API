@@ -20,5 +20,9 @@ module.exports = {
 
   async deleteBlacklistedUser(id){
     return await blacklistRepository.deleteBlacklistedUser(id)
+  },
+
+  async getEspecifIdByEmail (email){
+    return await blacklistRepository.getEspecifIdByEmail(email);
   }
 }
