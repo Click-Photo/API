@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 app.use(express.json());
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
+
 app.set('view engine', 'html');
 app.use(cookieParser());
 

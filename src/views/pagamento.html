@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação de Pagamento</title>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <h1>Simulação de Pagamento com Cartão de Crédito</h1>
+    <form id="payment-form">
+        <div id="card-element">
+            <!-- Elemento do cartão da Stripe -->
+        </div>
+        <button id="submit-button">Pagar</button>
+        <p id="error-message" style="color: red;"></p>
+    </form>
+
+    <script>
+        // Inicialize o Stripe com sua chave pública
+        const stripe = Stripe('pk_test_51Q6AL6P55fXBwDTpTvmUR62ZUF8ObmuuX90JFX9jrPX3UJLYWQx5EsdVok5k3EF2wVWj1M6mljX8NRJmeCJ5PPFX00i5ydYtfG'); 
+
+        // Recebe o clientSecret e jobId passados pelo backend
+        const clientSecret = "<%= clientSecret %>";
+        const jobId = "<%= jobId %>";
+
+        const elements = stripe.elements();
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+
+        document.getElementById('payment-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name: 'Nome do Cliente',
+                    },
+                }
+            });
+
+            if (error) {
+                document.getElementById('error-message').textContent = error.message;
+            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                alert('Pagamento realizado com sucesso!');
+                console.log('Pagamento realizado com sucesso!', paymentIntent);
+                
+                // Após o pagamento, chama a rota de confirmação no backend
+                await fetch(`http:localhost:3636/click/confirmarPagamento/${jobId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ paymentIntentId: paymentIntent.id }) // Envia o paymentIntentId para o backend
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao confirmar pagamento no backend:', error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

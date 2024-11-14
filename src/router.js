@@ -57,7 +57,7 @@ router.post('/confirmarPagamento/:jobId', jobsController.confirmarPagamento);
 // Rota para renderizar a página HTML de simulação do pagamento
 router.get('/simular-pagamento/:clientSecret/:jobId', (req, res) => {
     const { clientSecret, jobId } = req.params;
-    res.render('pagamento', { clientSecret, jobId });
+    res.render('pagamento.html', { clientSecret, jobId });
 });
 
 //Rotas do Controller User

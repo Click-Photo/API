@@ -1,5 +1,9 @@
 const jobService = require('../services/jobService');
-
+require('dotenv').config();
+const stripe = require('stripe')(`${process.env.STRIPE_KEY_TEST}`);
+const getPaymentIntentIdFromClientSecret = (clientSecret) => {
+    return clientSecret.split('_secret_')[0];
+};
 module.exports = {
     async getAllJobs(req, res) {
         try {
@@ -106,17 +110,43 @@ module.exports = {
         const { id } = req.params; // ID do Job
     
         try {
-            const job = await jobService.finalizarJob(id);
-            await jobService.createAvaliacoes(id, job.idCliente, job.idFotografo);
-            // const paymentIntent = await jobService.processPayment(job, job.idFotografo);
+            const job = await jobService.getEspecificJob(id);
+            // console.log("jobs", job)
+            // Cria a Payment Intent para o pagamento
+            const paymentIntent = await jobService.processPayment(job, job[0].idFotografo);
     
             res.status(200).json({
                 message: 'Job finalizado com sucesso, pagamento iniciado.',
-                // clientSecret: paymentIntent.client_secret // Client secret para o frontend completar o pagamento
+                clientSecret: paymentIntent.client_secret // Client secret para o frontend concluir o pagamento
             });
         } catch (err) {
             console.error('Erro ao finalizar job e processar pagamento', err);
             res.status(500).json({ message: 'Erro ao finalizar job e processar pagamento.' });
         }
+    },
+    async  confirmarPagamento(req, res) {
+        const { jobId } = req.params;
+        const { paymentIntentId, idCliente, idFotografo } = req.body;
+    
+        // Extrai o ID real do PaymentIntent do client_secret, caso necessário
+        const intentId = getPaymentIntentIdFromClientSecret(paymentIntentId);
+    
+        try {
+            // Recupera a Payment Intent usando o ID extraído
+            const paymentIntent = await stripe.paymentIntents.retrieve(intentId);
+    
+            if (paymentIntent.status === 'succeeded') {
+                // Atualiza o status do job para "finalizado"
+                await jobService.atualizarStatusJob(jobId, 'finalizado');
+                await jobService.createAvaliacoes(jobId, idCliente, idFotografo);
+    
+                res.status(200).json({ message: 'Job finalizado com sucesso após pagamento.' });
+            } else {
+                res.status(400).json({ message: 'Pagamento não confirmado.' });
+            }
+        } catch (err) {
+            console.error('Erro ao confirmar pagamento e finalizar o job', err);
+            res.status(500).json({ message: 'Erro ao confirmar pagamento e finalizar o job.' });
+       }
     }
-};
+}

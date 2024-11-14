@@ -14,6 +14,13 @@ class JobService {
         return await jobRepository.getJobsFotografo(id);
     }
 
+    async getEspecificJob(id) {
+        return await jobRepository.getEspecificJob(id);
+    }
+    async atualizarStatusJob(jobId, status) {
+        return await jobRepository.updateStatus(jobId, status);
+    }
+    
     async createJob(jobData) {
         const [idCliente] = jobData
         const role = await userRepository.get(idCliente);
@@ -43,8 +50,12 @@ class JobService {
     }
 
     async processPayment(job, fotografoId) {
-        const paymentIntent = await jobRepository.createPaymentIntent(job.preco, fotografoId);
-        return paymentIntent;
+        return await jobRepository.createPaymentIntent(parseFloat(job[0].preco), job[0].id, fotografoId);
+    }
+    
+    
+    async atualizarStatusJob(jobId, status) {
+        return await jobRepository.updateStatus(jobId, status);
     }
 }
 

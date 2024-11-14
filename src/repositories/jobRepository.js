@@ -21,6 +21,17 @@ class JobRepository {
         return job ? job.status : null; 
     }
 
+    async getEspecificJob(id) {
+        return await db('jobs')
+        .join('user', 'jobs.idFotografo', '=', 'user.id')
+        .where('jobs.id', id) 
+        .select('jobs.*', 'user.stripeAccountId');
+    }
+
+    async updateStatus(jobId, status) {
+        return await db('jobs').where({ id: jobId }).update({ status });
+    }
+
     async getJobsFotografo(id) {
         const jobs = await db('jobs').select('*').where({ idFotografo: id });
         const [{ totalJobs }] = await db('jobs').where({ idFotografo: id }).count('id as totalJobs');

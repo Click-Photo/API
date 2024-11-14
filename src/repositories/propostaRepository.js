@@ -1,5 +1,4 @@
 const db = require('../database/db');
-const nodemailer = require('nodemailer');
 
 class PropostaRepository {
     async getAllPropostas() {
@@ -80,15 +79,7 @@ class PropostaRepository {
         });
     }
 
-    async sendEmail(email, subject, htmlContent) {
-        await transporter.sendMmail({
-            from: '',
-            to: email,
-            subject: subject,
-            html: htmlContent
-
-        });
-    }
+    
 };
 
 module.exports = new PropostaRepository();

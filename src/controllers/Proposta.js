@@ -16,8 +16,8 @@ module.exports = {
 
         const {idJobs} = req.params;
         const{
-            idFotografo,
-            idCliente
+            idCliente,
+            idFotografo
         } = req.body;
 
         try{

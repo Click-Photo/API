@@ -1,6 +1,25 @@
 const propostaRepository = require('../repositories/propostaRepository');
 const jobRepository = require('../repositories/jobRepository');
 const userRepository = require('../repositories/userRepository'); 
+const nodemailer = require('nodemailer');
+
+const transporter =  nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'click.studio.ilustration@gmail.com',
+        pass: 'uoueupvqdobqlubg',
+    }
+});
+
+async function sendEmail(email, subject, htmlContent) {
+    await transporter.sendMail({ 
+        from: 'click.studio.ilustration@gmail.com', 
+        to: email,
+        subject: subject,
+        html: htmlContent
+    });
+}
+
 
 class PropostaService {
     async getAllPropostas() {
@@ -41,7 +60,6 @@ class PropostaService {
         await propostaRepository.aceitarProposta(id, idJobs, idFotografo);
 
         const email = await userRepository.getEmailById(idFotografo);
-
         if (!email) {
             throw new Error('Não foi possível encontrar o e-mail do fotógrafo.');
         }
@@ -57,7 +75,7 @@ class PropostaService {
             </div>
         `;
 
-        await propostaRepository.sendEmail(email, 'Atualização de proposta!', htmlContent);
+        await sendEmail(email[0].email, 'Atualização de proposta!', htmlContent);
     }
 
 
@@ -77,7 +95,7 @@ class PropostaService {
             </div>
         `;
 
-        await propostaRepository.sendEmail(email, 'Atualização de proposta.', htmlContent);
+        await sendEmail(email[0].email, 'Atualização de proposta.', htmlContent);
     }
 };
 
