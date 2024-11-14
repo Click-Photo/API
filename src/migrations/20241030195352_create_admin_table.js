@@ -4,8 +4,6 @@ exports.up = function(knex) {
         table.string('nome').notNullable();
         table.string('telefone').notNullable();
         table.string('email').unique().notNullable();
-        table.string('CPF').unique().notNullable();
-        table.string('CEP').notNullable();
         table.string('senha').notNullable();
         table.timestamp('dataEntrada').defaultTo(knex.fn.now());
     });

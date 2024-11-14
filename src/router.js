@@ -17,6 +17,7 @@ const interesseController = require('./controllers/Interesses');
 const userController = require('./controllers/User');
 const confirmaUserController = require('./controllers/ConfirmaUser');
 const adminController = require('./controllers/Admin');
+const authenticateJWT = require('./controllers/JwtAuthController.js');
 
 // Rotas do Controller Admin
 router.get('/visualizarAdmins', adminController.getAllAdmins);
@@ -56,37 +57,37 @@ router.get('/simular-pagamento/:clientSecret/:jobId', (req, res) => {
 
 //Rotas do Controller User
 router.post('/criarUsuario',userController.createUser);
-router.get('/visualizarUsuarios',userController.getAllUsers);
-router.put('/editarUsuario/:id',userController.updateUser);
-router.delete('/deletarUsuario/:id',userController.deleteUser);
+router.get('/visualizarUsuarios', authenticateJWT(['admin']), userController.getAllUsers);
+router.put('/editarUsuario/:id', authenticateJWT(['admin', 'fotografo', 'cliente']),userController.updateUser);
+router.delete('/deletarUsuario/:id', authenticateJWT(['admin', 'fotografo', 'cliente']),userController.deleteUser);
 router.post('/esqueciMinhaSenha',userController.reqResetPass);
 router.post('/verificarTicket',userController.verifyPasswordResetTicket);
 router.put('/trocarSenha', userController.resetPassword);
 router.post('/loginUsuario', userController.authUser);
 
 //Rotas do Controller Proposta
-router.post('/criarProposta/:idJobs',propostaController.createProposta);
-router.post('/visualizarProposta',propostaController.getAllPropostas);
-router.post('/visualizarPropostaCliente/:idCliente',propostaController.getAllPropostaCliente);
-router.post('/visualizarPropostaFotografo/:idFotografo',propostaController.getAllPropostaFotografo);
-router.post('/visulizarPropostaJob/:idJobs',propostaController.getAllPropostaJob);
-router.post('/aceitarProposta/:id', propostaController.aceitarProposta);
-router.post('/recusarProposta/:id', propostaController.recusarProposta);
-router.get('/getPropostaJob/:idJob', propostaController.getPropostaJob);
+router.post('/criarProposta/:idJobs', authenticateJWT(['admin', 'fotografo']),propostaController.createProposta);
+router.post('/visualizarProposta', authenticateJWT(['admin', 'fotografo', 'cliente']),propostaController.getAllPropostas);
+router.post('/visualizarPropostaCliente/:idCliente', authenticateJWT(['admin', 'cliente']),propostaController.getAllPropostaCliente);
+router.post('/visualizarPropostaFotografo/:idFotografo', authenticateJWT(['admin', 'fotografo']),propostaController.getAllPropostaFotografo);
+router.post('/visulizarPropostaJob/:idJobs', authenticateJWT(['admin', 'fotografo', 'cliente']),propostaController.getAllPropostaJob);
+router.post('/aceitarProposta/:id', authenticateJWT(['admin', 'cliente']), propostaController.aceitarProposta);
+router.post('/recusarProposta/:id', authenticateJWT(['admin', 'cliente']), propostaController.recusarProposta);
+router.get('/getPropostaJob/:idJob', authenticateJWT(['admin', 'cliente']), propostaController.getPropostaJob);
 
 //Rotas do Controller Jobs
-router.post('/criarJob',jobsController.createJob);
-router.post('/editarJob/:id',jobsController.updateJob);
-router.post('/deleteJob/:id',jobsController.deleteJob);
-router.post('/visualizarJobs',jobsController.getAllJobs);
-router.get('/getAllJobsCliente/:id', jobsController.getAllJobsCliente);
-router.post('/finalizarJob/:id',jobsController.finalizarJob);
-router.get('/getJobsFotografo/:id', jobsController.getJobsFotografo);
+router.post('/criarJob', authenticateJWT(['admin', 'cliente']),jobsController.createJob);
+router.post('/editarJob/:id', authenticateJWT(['admin', 'cliente']),jobsController.updateJob);
+router.post('/deleteJob/:id', authenticateJWT(['admin', 'cliente']),jobsController.deleteJob);
+router.post('/visualizarJobs', authenticateJWT(['admin', 'cliente']),jobsController.getAllJobs);
+router.get('/getAllJobsCliente/:id',  authenticateJWT(['admin', 'cliente']), jobsController.getAllJobsCliente);
+router.post('/finalizarJob/:id', authenticateJWT(['admin', 'fotografo', 'cliente']), jobsController.finalizarJob);
+router.get('/getJobsFotografo/:id', authenticateJWT(['admin', 'fotografo']),jobsController.getJobsFotografo);
 
 //Rotas de Controller cliente:
-router.post('/alterarCliente/:id',clienteController.updateClientes);
-router.post('/visualizarCliente',clienteController.getAllClientes);
-router.get('/getEspecifCliente/:id', clienteController.getEspecifCliente);
+router.post('/alterarCliente/:id', authenticateJWT(['admin', 'cliente']),clienteController.updateClientes);
+router.post('/visualizarCliente', authenticateJWT(['admin']),clienteController.getAllClientes);
+router.get('/getEspecifCliente/:id', authenticateJWT(['admin', 'cliente']), clienteController.getEspecifCliente);
 
 //Rotas do Controller ConfirmaCliente:
 router.post('/cadastroConfirmaCliente',confirmaClienteController.createConfirmaCliente);
@@ -98,28 +99,28 @@ router.post('/verificarTokenConfirmaFotografo',confirmaFotografoController.verif
 
 
 //Rotas de Controller  fotografo:
-router.post('/createAccountLink',fotografoController.createAccountLink);
-router.post('/alterarFotografo/:id',fotografoController.updateFotografo);
-router.post('/visualizarFotografo',fotografoController.getAllFotografos);
-router.get('/getEspecifFotografo/:id', fotografoController.getEspecifFotografo);
+router.post('/createAccountLink', authenticateJWT(['admin', 'fotografo']),fotografoController.createAccountLink);
+router.post('/alterarFotografo/:id', authenticateJWT(['admin', 'fotografo']),fotografoController.updateFotografo);
+router.post('/visualizarFotografo', authenticateJWT(['admin', 'fotografo']),fotografoController.getAllFotografos);
+router.get('/getEspecifFotografo/:id', authenticateJWT(['admin', 'fotografo']),fotografoController.getEspecifFotografo);
 
 //Rotas do Controller Avaliacoes
-router.get('/avaliacoesPendentesCliente/:clienteId', avaliacoesController.getAvaliacoesPendentesCliente);
-router.get('/avaliacoesPendentesFotografo/:fotografoId', avaliacoesController.getAvaliacoesPendentesFotografo);
-router.get('/mediaAvaliacoesCliente/:clienteId', avaliacoesController.mediaAvaliacoesCliente);
-router.get('/mediaAvaliacoesFotografo/:fotografoId', avaliacoesController.mediaAvaliacoesFotografo);
-router.post('/avaliarFotografo/:jobId', avaliacoesController.avaliarFotografo);
-router.post('/avaliarCliente/:jobId', avaliacoesController.avaliarCliente);
+router.get('/avaliacoesPendentesCliente/:clienteId', authenticateJWT(['admin', 'cliente']), avaliacoesController.getAvaliacoesPendentesCliente);
+router.get('/avaliacoesPendentesFotografo/:fotografoId', authenticateJWT(['admin', 'fotografo']), avaliacoesController.getAvaliacoesPendentesFotografo);
+router.get('/mediaAvaliacoesCliente/:clienteId',  authenticateJWT(['admin', 'cliente']),avaliacoesController.mediaAvaliacoesCliente);
+router.get('/mediaAvaliacoesFotografo/:fotografoId', authenticateJWT(['admin', 'fotografo']), avaliacoesController.mediaAvaliacoesFotografo);
+router.post('/avaliarFotografo/:jobId', authenticateJWT(['admin', 'cliente']), avaliacoesController.avaliarFotografo);
+router.post('/avaliarCliente/:jobId', authenticateJWT(['admin', 'fotografo']), avaliacoesController.avaliarCliente);
 
 //Rotas do Controller Portfolio
-router.get('/listarTodasFotos', portfolioController.listarFotosGeral);
-router.get('/listarFotosFotografo/:fotografoId', portfolioController.listarFotosFotografo);
-router.post('/adicionarFoto', upload.single('foto'), portfolioController.adicionarFoto);
-router.put('/editarInfoFoto/:idFoto', portfolioController.editarInfoFoto);
-router.delete('/deleteFoto/:fotoId', portfolioController.deleteFoto);
+router.get('/listarTodasFotos', authenticateJWT(['admin', 'fotografo', 'cliente']), portfolioController.listarFotosGeral);
+router.get('/listarFotosFotografo/:fotografoId', authenticateJWT(['admin', 'fotografo']),portfolioController.listarFotosFotografo);
+router.post('/adicionarFoto', authenticateJWT(['admin', 'fotografo']), upload.single('foto'), portfolioController.adicionarFoto);
+router.put('/editarInfoFoto/:idFoto', authenticateJWT(['admin', 'fotografo']), portfolioController.editarInfoFoto);
+router.delete('/deleteFoto/:fotoId', authenticateJWT(['admin', 'fotografo']), portfolioController.deleteFoto);
 
 //Rotas do Controller Interesse
-router.post('/marcarInteresse/:idJob', interesseController.marcarInteresse);
-router.get('/getInteressesFotografo/:idFotografo', interesseController.getInteressesFotografo);
+router.post('/marcarInteresse/:idJob', authenticateJWT(['admin', 'fotografo']), interesseController.marcarInteresse);
+router.get('/getInteressesFotografo/:idFotografo', authenticateJWT(['admin', 'fotografo']), interesseController.getInteressesFotografo);
 
 module.exports = router;

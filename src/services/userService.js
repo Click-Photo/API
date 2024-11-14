@@ -1,4 +1,5 @@
 const UserRepository = require('../repositories/userRepository')
+const AdminRepository = require('../repositories/adminRepository');
 const crypto = require('crypto');
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -145,28 +146,39 @@ module.exports = {
         return await UserRepository.resetPassword(user, hashedPass)
     },
 
-    async authLogin(user, res){
-        const {email,senha} = user;
-
-        const validUser = await UserRepository.resultEmail(user);
-        if(validUser.length === 0){
-            return {message: 'Email ou senha inválido!'};
+    async authLogin(user, res) {
+        const { email, senha } = user;
+        const validAdmin = await AdminRepository.findAdminByEmail(email);
+    
+        let validUser;
+        if (validAdmin) {
+            validUser = validAdmin;
+        } else {
+            validUser = await UserRepository.resultEmail(user);
+            if (!validUser) {
+                return { auth: false, message: 'Email ou senha inválido!' };
+            }
+        }
+  
+        const encryptedPassword = validAdmin? validUser.senha : validUser[0].senha; 
+        if (!encryptedPassword || !senha) {
+            return { auth: false, message: "Dados de senha ausentes" };
+        }
+        const comparePassword = await bcrypt.compare(senha, encryptedPassword);
+        if (!comparePassword) {
+            return { auth: false, message: "Login inválido" };
         }
 
-        const encryptedPassword = validUser[0].senha;
-        const comparePassword = await bcrypt.compare(senha, encryptedPassword)
+        const role = validAdmin ? 'admin' : validUser[0].role; 
 
-        if(!comparePassword){
-            return {auth: false, message: "Login inválido"}
-        }
-
-        const token = jwt.sign({id: user[0].id}, 'your_secret_key', { expiresIn: '1h' });
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 3600000 
-            });
-
-        return {auth:true, message: 'Login realizado com sucesso!'}
+        const token = jwt.sign({ email: email, role: role }, process.env.JWT_SECRET, { expiresIn: '3h' });
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3 * 60 * 60 * 1000 // Expira em 3 horas
+        });
+    
+        return { auth: true, message: 'Login realizado com sucesso!', role: role };
     }
+    
 }
