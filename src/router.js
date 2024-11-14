@@ -18,29 +18,34 @@ const userController = require('./controllers/User');
 const confirmaUserController = require('./controllers/ConfirmaUser');
 const adminController = require('./controllers/Admin');
 const authenticateJWT = require('./controllers/JwtAuthController.js');
+const blackListController = require('./controllers/Blacklist.js');
+
+// Rotas do Controller BlackList
+router.get('/visualizarBloqueados', authenticateJWT(['admin']), blackListController.getAllBlackListed)
+router.post('/bloquearUsuario', authenticateJWT(['admin']), blackListController.createBlacklistedUser)
+router.delete('/desbloquearUsuario/:id', authenticateJWT(['admin']), blackListController.deleteBlacklistedUser)
 
 // Rotas do Controller Admin
-router.get('/visualizarAdmins', adminController.getAllAdmins);
-router.post('/criarAdmin', adminController.createAdmin);
-router.post('/loginAdmin', adminController.loginAdmin);
+router.get('/visualizarAdmins', authenticateJWT(['admin']), adminController.getAllAdmins);
+router.post('/criarAdmin', authenticateJWT(['admin']), adminController.createAdmin);
 
 // Rotas de gestão de Clientes e Fotógrafos pelo Admin
-router.get('/visualizarFotografos', adminController.getAllFotografos);
-router.get('/visualizarClientes', adminController.getAllClientes);
-router.post('/adicionarCliente', adminController.addCliente);
-router.delete('/deletarCliente/:id', adminController.deleteCliente);
-router.post('/adicionarFotografo', adminController.addFotografo);
-router.delete('/deletarFotografo/:id', adminController.deleteFotografo);
+router.get('/visualizarFotografos', authenticateJWT(['admin']), adminController.getAllFotografos);
+router.get('/visualizarClientes', authenticateJWT(['admin']), adminController.getAllClientes);
+router.post('/adicionarCliente', authenticateJWT(['admin']), adminController.addCliente);
+router.delete('/deletarCliente/:id', authenticateJWT(['admin']), adminController.deleteCliente);
+router.post('/adicionarFotografo', authenticateJWT(['admin']), adminController.addFotografo);
+router.delete('/deletarFotografo/:id', authenticateJWT(['admin']), adminController.deleteFotografo);
 
 // Rotas de exclusão de Jobs e Portfólios pelo Admin
-router.delete('/deletarJob/:jobId', adminController.deleteJob);
-router.delete('/deletarImagemPortfolio/:imageId', adminController.deletePortfolioImage);
+router.delete('/deletarJob/:jobId', authenticateJWT(['admin']), adminController.deleteJob);
+router.delete('/deletarImagemPortfolio/:imageId', authenticateJWT(['admin']), adminController.deletePortfolioImage);
 
 // Rota para adicionar outro Administrador
-router.post('/adicionarAdmin', adminController.addAdmin);
+router.post('/adicionarAdmin', authenticateJWT(['admin']), adminController.addAdmin);
 
 // Rota para obter contagem de usuários (Clientes e Fotógrafos)
-router.get('/contagemUsuarios', adminController.getUserCounts);
+router.get('/contagemUsuarios', authenticateJWT(['admin']), adminController.getUserCounts);
 
 //Rotas do Controller Confirma User
 router.post('/cadastroConfirmaUser',confirmaUserController.createUser)

@@ -15,13 +15,12 @@ module.exports = {
     async createUser(req,res){
         try{
             const user = req.body;
-            const createUser = await  UserService.createUser(user);
+            const createUser = await UserService.createUser(user);
             if (createUser.onboardingLink) {
-                // Redireciona para o link de onboarding se for fotógrafo
                 return res.status(200).json(createUser.onboardingLink);
             }
-
-            res.status(201).json(createUser);
+          
+            res.status(200).json(createUser); 
         } catch(err){
             console.log(err);
             res.status(500).json({message: "Erro ao criar usuário: ", err})
