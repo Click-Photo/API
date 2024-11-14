@@ -10,6 +10,7 @@ exports.up = function(knex) {
         table.string("local").notNullable();
         table.string('status');
         table.string("preco").notNullable();
+        table.boolean('isTrending').defaultTo(false);
 
         table.foreign('idCliente').references('id').inTable('user');
         table.foreign('idFotografo').references('id').inTable('user');

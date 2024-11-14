@@ -1,13 +1,20 @@
 const jobService = require('../services/jobService');
 require('dotenv').config();
 const stripe = require('stripe')(`${process.env.STRIPE_KEY_TEST}`);
+
 const getPaymentIntentIdFromClientSecret = (clientSecret) => {
     return clientSecret.split('_secret_')[0];
 };
+
 module.exports = {
     async getAllJobs(req, res) {
         try {
+            // Atualiza os jobs com o status `isTrending`
+            await jobService.updateTrendingJobs();
+    
+            // Busca os jobs atualizados
             const jobs = await jobService.getAllJobs();
+    
             res.status(200).json(jobs);
         } catch (err) {
             console.error("Erro ao coletar informações sobre os jobs", err);

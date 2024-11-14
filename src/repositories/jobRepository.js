@@ -7,7 +7,14 @@ class JobRepository {
         return await db('jobs')
             .select('jobs.*', 'user.nome as nomeCliente')
             .join('user', 'jobs.idCliente', '=', 'user.id')
-            .whereNot('jobs.status', 'Finalizado');
+            .whereNot('jobs.status', 'Finalizado')
+            .orderBy('isTrending', 'desc');
+    }
+
+    async updateJobTrendingStatus(jobId, isTrending) {
+        return await db('jobs')
+            .where('id', jobId)
+            .update({ isTrending });
     }
 
     async getAllJobsCliente(id) {
