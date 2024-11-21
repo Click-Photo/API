@@ -10,8 +10,8 @@ exports.up = function(knex) {
       table.boolean('fotografoAvaliado').defaultTo(false); //Campo que determina se o fotografo já fez avaliação do cliente
 
       table.foreign('jobId').references('id').inTable('jobs');
-      table.foreign('clienteId').references('id').inTable('cliente');
-      table.foreign('fotografoId').references('id').inTable('fotografo');
+      table.foreign('clienteId').references('id').inTable('user');
+      table.foreign('fotografoId').references('id').inTable('user');
       
       table.unique(['jobId', 'clienteId', 'fotografoId']);  
     });

@@ -1,5 +1,5 @@
 exports.up = function(knex) {
-    return knex.schema.createTable('confirmaFotografo', function (table){
+    return knex.schema.createTable('confirmaUser', function (table){
         table.increments('id').primary();
         table.string('email').notNullable();
         table.string('nome').notNullable();
@@ -7,10 +7,11 @@ exports.up = function(knex) {
         table.string('CPF').notNullable();
         table.string('CEP').notNullable();
         table.string('senha').notNullable();
+        table.string('role').notNullable();
         table.timestamp('dataEntrada').notNullable();
     })
 };
 
 exports.down = function(knex) {
-  return knex.schema.dropTable('confirmaFotografo');
+  return knex.schema.dropTable('confirmaUser');
 };
