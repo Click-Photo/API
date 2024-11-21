@@ -27,6 +27,11 @@ module.exports = {
             return {message: user};
     },
 
+    async getAllUsers(){
+        const user = await db('user').select('*');
+        return {message: user};
+    },
+
     async getEspecifUserByEmail(email){
         const user = await db('user').select('id').where({email}).first();
         return user;
