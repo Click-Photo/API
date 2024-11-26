@@ -33,7 +33,7 @@ module.exports = {
     },
 
     async getEspecifUserByEmail(email){
-        const user = await db('user').select('id').where({email}).first();
+        const user = await db('user').select('*').where({email}).first();
         return user;
     },
 

@@ -72,7 +72,8 @@ module.exports = {
             validTicket = await UserRepository.validTicket(ticket);
         } while (validTicket)
 
-        const idUser = await UserRepository.getEspecifUserByEmail(resultEmail);
+        const user = await UserRepository.getEspecifUserByEmail(resultEmail);
+        const idUser = user.id;
         await UserRepository.reqPasswordReset(idUser, ticket);
 
 
