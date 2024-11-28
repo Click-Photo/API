@@ -1,16 +1,12 @@
 // knexfile.js
+require('dotenv').config();
+
 module.exports = {
-    development: {
+  development: {
     client: 'mysql2', 
-    connection: {
-      host: "localhost",
-      user: "root",
-      password: "",
-      database: "click",
+    connection: process.env.MYSQLURL,
+    migrations: {
+      directory: './src/migrations'
     },
-      migrations: {
-        directory: './src/migrations'
-      },
-    }
-  };
-  
+  },
+};
