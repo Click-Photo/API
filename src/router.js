@@ -19,11 +19,17 @@ const confirmaUserController = require('./controllers/ConfirmaUser');
 const adminController = require('./controllers/Admin');
 const authenticateJWT = require('./controllers/JwtAuthController.js');
 const blackListController = require('./controllers/Blacklist.js');
+const reportController = require('./controllers/Report.js');
+
+// Rotas do Controller Report
+router.get('/getReports', authenticateJWT(['admin']), reportController.getReports);
+router.post('/createReport', authenticateJWT(['admin', 'fotografo', 'cliente']), reportController.createReport);
+router.delete('/resolveReport', authenticateJWT(['admin']), reportController.resolveReport);
 
 // Rotas do Controller BlackList
-router.get('/visualizarBloqueados', authenticateJWT(['admin']), blackListController.getAllBlackListed)
-router.post('/bloquearUsuario', authenticateJWT(['admin']), blackListController.createBlacklistedUser)
-router.delete('/desbloquearUsuario/:id', authenticateJWT(['admin']), blackListController.deleteBlacklistedUser)
+router.get('/visualizarBloqueados', authenticateJWT(['admin']), blackListController.getAllBlackListed);
+router.post('/bloquearUsuario', authenticateJWT(['admin']), blackListController.createBlacklistedUser);
+router.delete('/desbloquearUsuario/:id', authenticateJWT(['admin']), blackListController.deleteBlacklistedUser);
 
 // Rotas do Controller Admin
 router.get('/visualizarAdmins', authenticateJWT(['admin']), adminController.getAllAdmins);

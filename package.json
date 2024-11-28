@@ -19,7 +19,8 @@
     "stripe": "^17.3.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./src/api.js"
+    "dev": "nodemon ./src/api.js",
+    "build": "knex migrate:latest",
+    "start": "node ./src/api.js"
   }
 }
