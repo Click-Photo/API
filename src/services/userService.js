@@ -1,6 +1,7 @@
-const UserRepository = require('../repositories/userRepository')
-const blacklistRepository = require ('../repositories/blacklistRepository')
+const UserRepository = require('../repositories/userRepository');
+const blacklistRepository = require ('../repositories/blacklistRepository');
 const AdminRepository = require('../repositories/adminRepository');
+const fotografoService = require('../services/fotografoService');
 const crypto = require('crypto');
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -37,7 +38,8 @@ module.exports = {
         const id = await UserRepository.createUser(user, hashPass, dataAtual);
     
         if (user.role === "fotografo") {
-            return { id, message: 'Fotógrafo criado com sucesso!' };
+            const { stripeAccountLink, message } = await fotografoService.criarContaFotografo(user);
+            return { id, message, stripeAccountLink };
         } 
     
         if (user.role === "cliente") {
@@ -45,8 +47,7 @@ module.exports = {
         }
     
         return { id, message: 'Administrador criado com sucesso!' };
-    }
-    ,
+    },
 
     async updateUser(user,idUser){
              await UserRepository.updateUser(user,idUser)
