@@ -64,8 +64,13 @@ module.exports = {
 
         return id;
     },
-  
 
+    async updateStripeAccountId(email, stripeAccountId) {
+        return await db('user') 
+            .where({ email: email }) 
+            .update({ stripeAccountId: stripeAccountId });  
+    },
+  
     async updateUser (user, idUser){
         const {id} = idUser; //Puxa o ID
         const {nome, telefone, email, CEP} = user; //Puxa todas as informações
