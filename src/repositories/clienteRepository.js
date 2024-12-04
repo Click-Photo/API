@@ -6,7 +6,7 @@ module.exports = {
     },
 
     async getEspecifCliente(id) {
-        return db('user').select('*').where({id});
+        return db('user').select('*').where({id}).first();
     },
 
     async updateClientes(id, data) {

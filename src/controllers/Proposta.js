@@ -16,13 +16,13 @@ module.exports = {
 
         const {idJobs} = req.params;
         const{
-            idCliente,
-            idFotografo
+            idFotografo,
+            valorProposta
         } = req.body;
 
         try{
-            await propostaService.createProposta(idJobs, idCliente, idFotografo);
-            res.status(200).json({message: "Proposta realizada"})
+            await propostaService.createProposta(idJobs, idFotografo, valorProposta);
+            res.status(201).json({message: "Proposta realizada"})
         } catch(err) {
             console.error("Erro ao criar proposta " , err);
             return res.status(500).json({message: "Erro ao criar o proposta"})

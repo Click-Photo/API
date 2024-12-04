@@ -6,7 +6,7 @@ module.exports = {
     },
 
     async getEspecifFotografo(id) {
-        return db('user').select('*').where({ id });
+        return db('user').select('*').where({ id }).first();
     },
 
     async updateFotografo(id, data) {

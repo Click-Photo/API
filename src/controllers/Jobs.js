@@ -69,7 +69,7 @@ module.exports = {
                 preco
             });
 
-            res.status(200).json({ message: "Job criado!", id });
+            res.status(201).json({ message: "Job criado!", id });
         } catch (err) {
             console.error("Erro ao criar Job", err);
             res.status(500).json({ message: 'Erro ao criar Job' });

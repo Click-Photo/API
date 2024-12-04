@@ -20,7 +20,7 @@
   },
   "scripts": {
     "dev": "nodemon ./src/api.js",
-    "build": "knex migrate:latest",
+    "build": "pip install scikit-learn && pip install nltk && knex migrate:latest",
     "start": "node ./src/api.js"
   }
 }

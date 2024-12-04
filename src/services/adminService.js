@@ -58,6 +58,13 @@ module.exports = {
     },
 
     async addAdmin(adminData) {
+        const { email } = adminData;
+        const adminWithEmailExists = await adminRepository.findAdminByEmail(email)
+
+        if (adminWithEmailExists) {
+            throw new Error('Admin já está cadastrado')
+        }
+
         adminData.senha = await bcrypt.hash(adminData.senha, saltRounds);
         return await adminRepository.addAdmin(adminData);
     },

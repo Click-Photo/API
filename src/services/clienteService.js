@@ -7,8 +7,8 @@ module.exports = {
         return await clienteRepository.getAllClientes();
     },
 
-    async getClienteById(id) {
-        return await clienteRepository.getClienteById(id);
+    async getEspecifCliente(id) {
+        return await clienteRepository.getEspecifCliente(id);
     },
 
     async createAccountLink(stripeAccountId) {
@@ -20,12 +20,11 @@ module.exports = {
         });
     },
 
-    async updateClientes(id, nome, telefone, senha, CEP) {
-        const hashedPassword = await bcrypt.hash(senha, 10);
+    async updateClientes(id, email, nome, telefone, senha, CEP) {
         const data = {
+            email,
             nome,
             telefone,
-            senha: hashedPassword,
             CEP
         };
         return await clienteRepository.updateClientes(id, data);
