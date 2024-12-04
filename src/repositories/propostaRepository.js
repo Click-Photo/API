@@ -5,10 +5,11 @@ class PropostaRepository {
         return await db('proposta').select('*');
     }
 
-    async createProposta(idJobs, idFotografo) {
+    async createProposta(idJobs, idFotografo, valorProposta) {
         return await db('proposta').insert({
             idFotografo,
-            idJobs
+            idJobs,
+            valorProposta
         });
     }
 

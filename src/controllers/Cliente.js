@@ -3,7 +3,7 @@ const clienteService = require('../services/clienteService');
 module.exports = {
     async getAllClientes(req, res) {
         try {
-            const clientes = await db('cliente').select('*');
+            const clientes = clienteService.getAllClientes(id);
             res.status(200).json(clientes);
         } catch (err) {
             console.error('clientes não encontrados', err);
@@ -15,7 +15,7 @@ module.exports = {
         const { id } = req.params;
 
         try {
-            const clientes = await db('cliente').select('*').where({ id });
+            const clientes = await clienteService.getEspecifCliente(id);
             res.status(200).json(clientes);
         } catch (err) {
             console.error('clientes não encontrados', err);
@@ -36,11 +36,11 @@ module.exports = {
     },
 
     async updateClientes(req, res) {
-        const { nome, telefone, senha, CEP, } = req.body;
+        const { nome, email, telefone, senha, CEP, } = req.body;
         const { id } = req.params;
         
         try {
-            await clienteService.updateClientes(id, nome, telefone, senha, CEP);
+            await clienteService.updateClientes(id, email, nome, telefone, senha, CEP);
             res.status(200).json({ message: 'Dados do cliente atualizados com sucesso!' });
         } catch (err) {
             console.error('Impossivel alterar dados do cliente', err);

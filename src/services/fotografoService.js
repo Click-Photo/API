@@ -59,6 +59,7 @@ module.exports = {
     async updateFotografo(id, nome, telefone, senha, CEP) {
         const hashedPassword = await bcrypt.hash(senha, 10);
         const data = {
+            email,
             nome,
             telefone,
             senha: hashedPassword,

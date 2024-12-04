@@ -1,8 +1,6 @@
 const knex = require('knex');
 const knexConfig = require('../../knexfile.js'); // Importa as configurações do knexfile.js
 
-console.log('Tá passadno por aquio')
-
 // Cria a conexão com o banco de dados usando as configurações do knexfile.js
 const db = knex(knexConfig.development);
 

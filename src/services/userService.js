@@ -125,29 +125,33 @@ module.exports = {
             validUser = validAdmin;
         } else {
             validUser = await UserRepository.resultEmail(user);
-            if (!validUser) {
-                return { auth: false, message: 'Email ou senha inválido!' };
-            }
         }
-  
-        const encryptedPassword = validAdmin? validUser.senha : validUser[0].senha; 
+        
+        if (!validUser || !validUser.lenght < 1) {
+            return { auth: false, message: 'Email ou senha inválido' };
+        }
+
+        const encryptedPassword = validAdmin ? validAdmin.senha : validUser[0].senha;
+
         if (!encryptedPassword || !senha) {
             return { auth: false, message: "Dados de senha ausentes" };
         }
         const comparePassword = await bcrypt.compare(senha, encryptedPassword);
         if (!comparePassword) {
-            return { auth: false, message: "Login inválido" };
+            return { auth: false, message: "Email ou senha inválido" };
         }
 
-        const role = validAdmin ? 'admin' : validUser[0].role; 
+        const role = validAdmin ? 'admin' : validUser[0].role;
 
-        const token = jwt.sign({ email: email, role: role }, process.env.JWT_SECRET, { expiresIn: '3h' });
+        const token = jwt.sign({ id: validAdmin ? validUser.id : validUser[0].id, role: role }, process.env.JWT_SECRET, { expiresIn: '3h' });
+
         res.cookie('authToken', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
             maxAge: 3 * 60 * 60 * 1000 // Expira em 3 horas
         });
     
-        return { auth: true, message: 'Login realizado com sucesso!', role: role };
+        return { auth: true, message: 'Login realizado com sucesso!', role: role, token };
     }
 }

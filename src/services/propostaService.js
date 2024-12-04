@@ -26,13 +26,18 @@ class PropostaService {
         return await propostaRepository.getAllPropostas();
     }
 
-    async createProposta(idJobs, idCliente, idFotografo) {
+    async createProposta(idJobs, idFotografo, valorProposta) {
         const statusJob = await jobRepository.validarStatusJob(idJobs);
+        const job = await jobRepository.getEspecificJob(idJobs)
+
+        if (!job) {
+            throw new Error('Id de Job inválido')
+        }
 
         if (statusJob === 'Aceito' | statusJob === 'Finalizado') {
             throw new Error('Não é possível criar uma proposta para um job que já foi aceito ou finalizado.');
         }
-        return await propostaRepository.createProposta(idJobs, idCliente, idFotografo);
+        return await propostaRepository.createProposta(idJobs, idFotografo, valorProposta);
     }
 
     async deleteProposta(id) {

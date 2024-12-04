@@ -36,11 +36,11 @@ module.exports = {
     },
 
     async updateFotografo(req, res) {
-        const { nome, telefone, senha, CEP } = req.body;
+        const { nome, email, telefone, senha, CEP } = req.body;
         const { id } = req.params;
 
         try {
-            await fotografoService.updateFotografo(id, nome, telefone, senha, CEP);
+            await fotografoService.updateFotografo(id, email, nome, telefone, senha, CEP);
             res.status(200).json({ message: 'Dados do fotógrafo atualizado com sucesso!' });
         } catch (err) {
             console.error('Impossivel alterar dados do fotógrafo', err);
